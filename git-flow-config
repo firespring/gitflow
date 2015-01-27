@@ -108,11 +108,11 @@ file=     Use given config file
 	output=$(git config $gitflow_config_option --get gitflow.branch.master)
 	echo "Branch name for production releases: $output "
 
-	output=$(git config $gitflow_config_option --get gitflow.branch.develop)
-	echo "Branch name for \"next release\" development: $output "
-
 	output=$(git config $gitflow_config_option --get gitflow.prefix.feature)
 	echo "Feature branch prefix: $output "
+
+	output=$(git config $gitflow_config_option --get gitflow.prefix.story)
+	echo "Story branch prefix: $output "
 
 	output=$(git config $gitflow_config_option --get gitflow.prefix.release)
 	echo "Release branch prefix: $output "
@@ -159,13 +159,13 @@ file=     Use given config file
 		cfg_option="gitflow.branch.master"
 		txt="Branch name for production releases"
 		;;
-	develop)
-		cfg_option="gitflow.branch.develop"
-		txt="Branch name for \"next release\" development"
-		;;
 	feature)
 		cfg_option="gitflow.prefix.feature"
 		txt="Feature branch prefix"
+		;;
+	story)
+		cfg_option="gitflow.prefix.story"
+		txt="Story branch prefix"
 		;;
 	hotfix)
 		cfg_option="gitflow.prefix.hotfix"
@@ -191,24 +191,6 @@ file=     Use given config file
 	[ -n "$value" ] || die_help "No value given"
 
 	if [ $OPTION = "master" ]; then
-		develop_branch=$(git config --get gitflow.branch.develop)
-		if [ "$value" = $develop_branch ]; then
-			die "Production and \"next release\" branch should differ."
-		fi
-
-		if ! git_local_branch_exists "$value" && git_remote_branch_exists "origin/$value"; then
-			git_do branch "$value" "origin/$value" >/dev/null 2>&1
-		elif ! git_local_branch_exists "$value"; then
-			die "Local branch '$value' does not exist."
-		fi
-	fi
-
-	if [ $OPTION = "develop" ]; then
-		master_branch=$(git config --get gitflow.branch.master)
-		if [ "$value" = $master_branch ]; then
-			die "Production and \"next release\" branch should differ."
-		fi
-
 		if ! git_local_branch_exists "$value" && git_remote_branch_exists "origin/$value"; then
 			git_do branch "$value" "origin/$value" >/dev/null 2>&1
 		elif ! git_local_branch_exists "$value"; then

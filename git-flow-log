@@ -45,7 +45,7 @@ usage() {
     OPTIONS_SPEC="\
 git flow log
 
-shows current branch log compared to develop
+shows current branch log compared to master
 'git help log' for arguments
 --
 "
@@ -60,7 +60,7 @@ cmd_list() {
     OPTIONS_SPEC="\
 git flow feature log [<options>]
 
-Show log on <feature> branch since the fork of <develop> branch
+Show log on <feature> branch since the fork of <master> branch
 Options come from git log
 --
 h,help!         Show this help

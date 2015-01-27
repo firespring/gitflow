@@ -74,6 +74,8 @@ max() { [ "$1" -ge "$2" ] && echo "$1" || echo "$2"; }
 # Basic string matching
 startswith() { [ "$1" != "${1#$2}" ]; }
 endswith() { [ "$1" != "${1%$2}" ]; }
+contains() { [ `echo "$1" | egrep -q "$2"; echo $?` -eq 0 ]; }
+notcontains() { [ `echo "$1" | egrep -q "$2"; echo $?` -ne 0 ]; }
 
 # Convenience functions for checking shFlags flags
 flag() { local FLAG; eval FLAG='$FLAGS_'$1; [ $FLAG -eq $FLAGS_TRUE ]; }
@@ -272,15 +274,9 @@ gitflow_has_master_configured() {
 	[ "$master" != "" ] && git_local_branch_exists "$master"
 }
 
-gitflow_has_develop_configured() {
-	local develop
-
-	develop=$(git config --get gitflow.branch.develop)
-	[ "$develop" != "" ] && git_local_branch_exists "$develop"
-}
-
 gitflow_has_prefixes_configured() {
 	git config --get gitflow.prefix.feature >/dev/null 2>&1     && \
+	git config --get gitflow.prefix.story >/dev/null 2>&1     && \
 	git config --get gitflow.prefix.release >/dev/null 2>&1     && \
 	git config --get gitflow.prefix.hotfix >/dev/null 2>&1      && \
 	git config --get gitflow.prefix.support >/dev/null 2>&1     && \
@@ -289,8 +285,6 @@ gitflow_has_prefixes_configured() {
 
 gitflow_is_initialized() {
 	gitflow_has_master_configured                    && \
-	gitflow_has_develop_configured                   && \
-	[ "$(git config --get gitflow.branch.master)" != "$(git config --get gitflow.branch.develop)" ] && \
 	gitflow_has_prefixes_configured
 }
 
@@ -298,10 +292,9 @@ gitflow_is_initialized() {
 gitflow_load_settings() {
 	export GIT_CURRENT_REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"
 	DOT_GIT_DIR=$(git rev-parse --git-dir)
-	export DOT_GIT_DIR=$(cd "$DOT_GIT_DIR" && pwd)
+	export DOT_GIT_DIR=$(cd "$DOT_GIT_DIR" 2>&1 1>/dev/null && pwd)
 	export HOOKS_DIR=$(git config --get gitflow.path.hooks || echo "$DOT_GIT_DIR"/hooks) # the second option is used to support previous versions of git-flow
 	export MASTER_BRANCH=$(git config --get gitflow.branch.master)
-	export DEVELOP_BRANCH=$(git config --get gitflow.branch.develop)
 	export ORIGIN=$(git config --get gitflow.origin || echo origin)
 
 	GITFLOW_CONFIG=$DOT_GIT_DIR/gitflow_config
@@ -499,6 +492,12 @@ gitflow_create_squash_message() {
 #
 # Parameter functions
 #
+gitflow_require_feature_arg() {
+	if [ "$FEATURE_NAME" = "" ]; then
+		die_help "Missing argument <feature>"
+	fi
+}
+
 gitflow_require_name_arg() {
 	if [ "$NAME" = "" ]; then
 		die_help "Missing argument <name>"
@@ -559,14 +558,34 @@ gitflow_use_current_branch_name() {
 
 	current_branch=$(git_current_branch)
 
-	if startswith "$current_branch" "$PREFIX"; then
+	if startswith "$current_branch" "$PREFIX" && notcontains "$current_branch" "story"; then
 		BRANCH=$current_branch
-		NAME=${BRANCH#$PREFIX}
+		NAME=`echo "$BRANCH" | sed -re "s@.*$PREFIX([^/]+).*@\1@g"`
+
+	elif contains "$current_branch" "$PREFIX" && [ "$SUBCOMMAND" = 'story' ]; then
+		BRANCH=$current_branch
+		NAME=`echo "$BRANCH" | sed -re "s@.*$PREFIX([^/]+).*@\1@g"`
+
 	else
-		warn "The current HEAD is no ${SUBCOMMAND} branch."
+		warn "The curent HEAD is no ${SUBCOMMAND} branch."
 		warn "Please specify a <name> argument."
 		exit 1
+
 	fi
+}
+
+gitflow_use_story_feature() {
+  local story_branches story_branch
+
+  story_branch=$(git_local_branches_prefixed "*/*/$PREFIX$NAME")
+  if [ -z $story_branch ]; then
+    warn "Unable to find the feature associated with this story"
+    exit 1
+  fi
+
+  FEATURE_NAME=`echo $story_branch | cut -d '/' -f 2`
+  FEATURE_BRANCH=$FEATURE_PREFIX$FEATURE_NAME
+  BRANCH=$FEATURE_BRANCH/$PREFIX$NAME
 }
 
 gitflow_use_current_branch_version() {
@@ -574,13 +593,19 @@ gitflow_use_current_branch_version() {
 
 	current_branch=$(git_current_branch)
 
-	if startswith "$current_branch" "$PREFIX"; then
+	if startswith "$current_branch" "$PREFIX" && notcontains "$current_branch" "story"; then
 		BRANCH=$current_branch
-		VERSION=${BRANCH#$PREFIX}
+		VERSION=`echo "$BRANCH" | sed -re "s@.*$PREFIX([^/]+).*@\1@g"`
+
+	elif contains "$current_branch" "$PREFIX" && [ "$SUBCOMMAND" = 'story' ]; then
+		BRANCH=$current_branch
+		VERSION=`echo "$BRANCH" | sed -re "s@.*$PREFIX([^/]+).*@\1@g"`
+
 	else
 		warn "The current HEAD is no ${SUBCOMMAND} branch."
 		warn "Please specify a <version> argument."
 		exit 1
+
 	fi
 }
 #

@@ -1,68 +1,17 @@
-# git-flow (AVH Edition)
+# git-flow (KANBAN Edition)
 
 A collection of Git extensions to provide high-level repository operations
-for Vincent Driessen's [branching model](http://nvie.com/git-model "original
-blog post"). This fork adds functionality not added to the original branch.
+for a Kanban style of release management
 
 
 ## Getting started
 
-For the best introduction to get started with `git flow`, please read Jeff
-Kreeftmeijer's blog post:
-
-[http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/](http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/)
-
-Or have a look at one of these screen casts:
-
-* [How to use a scalable Git branching model called git-flow](http://buildamodule.com/video/change-management-and-version-control-deploying-releases-features-and-fixes-with-git-how-to-use-a-scalable-git-branching-model-called-gitflow) (by Build a Module)
-* [A short introduction to git-flow](http://vimeo.com/16018419) (by Mark Derricutt)
-* [On the path with git-flow](http://codesherpas.com/screencasts/on_the_path_gitflow.mov) (by Dave Bock)
+This is an internal branch to support the desired functionality of the team
 
 
 ## Installing git-flow
 
-See the Wiki for up-to-date [Installation Instructions](https://github.com/petervanderdoes/gitflow/wiki/Installation).
-
-
-## Integration with your shell
-
-For those who use the [Bash](http://www.gnu.org/software/bash/) or [ZSH](http://www.zsh.org) 
-shell, you can use my [fork of git-flow-completion](https://github.com/petervanderdoes/git-flow-completion) 
-which includes several additions for git-flow (AVH Edition), or you can use the 
-original [git-flow-completion](http://github.com/bobthecow/git-flow-completion) 
-project by [bobthecow](http://github.com/bobthecow). Both offer tab-completion 
-for git-flow subcommands and branch names with my fork including tab-completion 
-for the commands not found in the original git-flow.
-
-
-## FAQ
-
-* See the [FAQ](http://github.com/petervanderdoes/gitflow/wiki/FAQ) section
-of the project Wiki.
-* Version Numbering Scheme.  
-Starting with version 1.0, the project uses the following scheme:
-\<MAJOR\>.\<MINOR\>.\<REVISION\>\
-
-## Please help out
-
-This project is under constant development. Feedback and suggestions are very
-welcome and I encourage you to use the [Issues
-list](http://github.com/petervanderdoes/gitflow/issues) on Github to provide that
-feedback.
-
-Feel free to fork this repository and to commit your additions. For a list of 
-all contributors, please see the [AUTHORS](AUTHORS) file.
-
-Any questions, tips, or general discussion can be posted to the Google group:
-[http://groups.google.com/group/gitflow-users](http://groups.google.com/group/gitflow-users)
-This is the original group set up to support the nvie branch, but I am monitoring
-the list as well for any questions related to my version.
-When you do post a question on the list please indicate which version you are,
-using the complete version number.
-
-## Contributing
-
-Fork the repository.  Then, run:
+Clone the repository. Then, run:
 
 ```shell
 git clone git@github.com:<username>/gitflow.git
@@ -109,6 +58,7 @@ The ``-d`` flag will accept all defaults.
 
 
 ### Creating feature/release/hotfix/support branches
+# TODO:
 
 * To list/start/finish/delete feature branches, use:
 
@@ -156,15 +106,20 @@ the command.
 The files should be placed in .git/hooks  
 In the directory hooks you can find examples of all the hooks available.
 
-## Showing your appreciation
+## Still to do:
 
-Of course, the best way to show your appreciation for the git-flow tool itself
-remains contributing to the community.  If you'd like to show your appreciation
-in another way, however, consider donating through PayPal:
+* Validations
+ * Make sure the given names match the correct type (feature/story)
 
-[![PayPal][2]][1]
+* git flow story ...
+  * maybe should automatically create the feature branch if it doesn't exist?
+  * probably will have to specify the feature branch to associate with, but if we can think of a better way to do it automatically then that would be ideal.
 
-[1]: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=S85FXJ9EBHAF2&lc=US&item_name=gitflow&item_number=gitflow&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller&no_shipping=1&rm=1&return=https%3a%2f%2fgithub%2ecom%2fpetervanderdoes%2fgitflow&cancel_return=https%3a%2f%2fgithub%2ecom%2fpetervanderdoes%2fgitflow&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted
-[2]: https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif
+git flow story finish TP-1234 TP-1235
+  * Should merge into feature/TP-1234/develop and delete branch
+  * Probably don't have to specify feature - but it might make it faster
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/petervanderdoes/gitflow/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+git flow feature finish r751-1 TP-1234
+  * Should merge into release branch. Kinda weird specifying the release branch since we haven't done that yet.
+  * Should either verify all story branches are closed or close all story branches as a part of this action.
+

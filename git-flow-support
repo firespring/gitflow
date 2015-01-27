@@ -227,7 +227,7 @@ p,[no]preserve-merges  Preserve merges
 	fi
 
 	BASE_BRANCH=$(gitflow_config_get_base_branch $BRANCH)
-	BASE_BRANCH=${BASE_BRANCH:-$DEVELOP_BRANCH}
+	BASE_BRANCH=${BASE_BRANCH:-$MASTER}
 
 	warn "Will try to rebase '$NAME' which is based on '$BASE_BRANCH'..."
 	require_clean_working_tree

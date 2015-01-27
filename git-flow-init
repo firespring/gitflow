@@ -72,7 +72,7 @@ system!  use system config file
 file=    use given config file
 "
 	local gitflow_config_option should_check_existence branchcount guess
-  	local master_branch develop_branch default_suggestion answer prefix
+  	local master_branch default_suggestion answer prefix
 
 	# Define flags
 	DEFINE_boolean 'force' false 'force setting of gitflow branches, even if already configured' f
@@ -125,9 +125,9 @@ file=    use given config file
 	else
 		# Two cases are distinguished:
 		# 1. A fresh git repo (without any branches)
-		#    We will create a new master/develop branch for the user
+		#    We will create a new master branch for the user
 		# 2. Some branches do already exist
-		#    We will disallow creation of new master/develop branches and
+		#    We will disallow creation of new master branches and
 		#    rather allow to use existing branches for git-flow.
 		branch_count=$(git_local_branches | wc -l)
 		if [ "$branch_count" -eq 0 ]; then
@@ -172,58 +172,6 @@ file=    use given config file
 		git_do config $gitflow_config_option gitflow.branch.master "$master_branch"
 	fi
 
-	# Add a develop branch if no such branch exists yet
-	if gitflow_has_develop_configured && ! flag force; then
-		develop_branch=$(git config --get gitflow.branch.develop)
-	else
-		# Again, the same two cases as with the master selection are
-		# considered (fresh repo or repo that contains branches)
-		branch_count=$(git_local_branches | grep -v "^${master_branch}\$" | wc -l)
-		if [ "$branch_count" -eq 0 ]; then
-			should_check_existence=NO
-			default_suggestion=$(git config --get gitflow.branch.develop || echo develop)
-		else
-			echo
-			echo "Which branch should be used for integration of the \"next release\"?"
-			git_local_branches | grep -v "^${master_branch}\$" | sed 's/^.*$/   - &/g'
-
-			should_check_existence=YES
-			default_suggestion=
-			for guess in $(git config --get gitflow.branch.develop) 'develop' 'int' 'integration' 'master'; do
-				if git_local_branch_exists "$guess" && [ "$guess" != "$master_branch" ]; then
-					default_suggestion="$guess"
-					break
-				fi
-			done
-
-			if [ -z $default_suggestion ]; then
-				should_check_existence=NO
-				default_suggestion=$(git config --get gitflow.branch.develop || echo develop)
-			fi
-
-		fi
-
-		printf "Branch name for \"next release\" development: [$default_suggestion] "
-		if noflag defaults; then
-			read answer
-		else
-			printf "\n"
-		fi
-		develop_branch=${answer:-$default_suggestion}
-
-		if [ "$master_branch" = "$develop_branch" ]; then
-			die "Production and integration branches should differ."
-		fi
-
-		# Check existence in case of an already existing repo
-		if [ "$should_check_existence" = "YES" ]; then
-			git_local_branch_exists "$develop_branch" || die "Local branch '$develop_branch' does not exist."
-		fi
-
-		# Store the name of the develop branch
-		git_do config $gitflow_config_option gitflow.branch.develop "$develop_branch"
-	fi
-
 	# Creation of HEAD
 	# ----------------
 	# We create a HEAD now, if it does not exist yet (in a fresh repo). We need
@@ -241,32 +189,14 @@ file=    use given config file
 	# (and was picked interactively as the production branch) or it has just
 	# been created in a fresh repo
 
-	# Creation of develop
-	# -------------------
-	# The develop branch possibly does not exist yet.  This is the case when,
-	# in a git init'ed repo with one or more commits, master was picked as the
-	# default production branch and develop was "created".  We should create
-	# the develop branch now in that case (we base it on master, of course)
-	if ! git_local_branch_exists "$develop_branch"; then
-		if git_remote_branch_exists "origin/$develop_branch"; then
-			git_do branch "$develop_branch" "origin/$develop_branch" >/dev/null 2>&1
-		else
-			git_do branch --no-track "$develop_branch" "$master_branch"
-		fi
-		created_gitflow_branch=1
-	fi
-
 	# Assert the git-flow repo has been correctly initialized
 	gitflow_is_initialized
 
-	# Switch to develop branch if its newly created
-	if [ $created_gitflow_branch -eq 1 ]; then
-		git_do checkout -q "$develop_branch" || die "Could not check out branch '$develop_branch'."
-	fi
-
 	# Ask the user for naming conventions (branch and tag prefixes )
 	if flag force || \
+		! git config --get gitflow.branch.feature.base >/dev/null 2>&1 ||
 		! git config --get gitflow.prefix.feature >/dev/null 2>&1 ||
+		! git config --get gitflow.prefix.story >/dev/null 2>&1 ||
 		! git config --get gitflow.prefix.release >/dev/null 2>&1 ||
 		! git config --get gitflow.prefix.hotfix >/dev/null 2>&1 ||
 		! git config --get gitflow.prefix.support >/dev/null 2>&1 ||
@@ -286,6 +216,32 @@ file=    use given config file
 		fi
 		[ "$answer" = "-" ] && prefix= || prefix=${answer:-$default_suggestion}
 		git_do config $gitflow_config_option gitflow.prefix.feature "$prefix"
+	fi
+
+	# Feature base branche
+	if ! git config --get gitflow.branch.feature.base >/dev/null 2>&1 || flag force; then
+		default_suggestion=$(git config --get gitflow.branch.feature.base || echo develop)
+		printf "Feature base branch? [$default_suggestion] "
+		if noflag defaults; then
+			read answer
+		else
+			printf "\n"
+		fi
+		[ "$answer" = "-" ] && base= || base=${answer:-$default_suggestion}
+		git_do config $gitflow_config_option gitflow.branch.feature.base "$base"
+	fi
+
+	# Story branches
+	if ! git config --get gitflow.prefix.story >/dev/null 2>&1 || flag force; then
+		default_suggestion=$(git config --get gitflow.prefix.story || echo story/)
+		printf "Story branches? [$default_suggestion] "
+		if noflag defaults; then
+			read answer
+		else
+			printf "\n"
+		fi
+		[ "$answer" = "-" ] && prefix= || prefix=${answer:-$default_suggestion}
+		git_do config $gitflow_config_option gitflow.prefix.story "$prefix"
 	fi
 
 	# Release branches
@@ -343,7 +299,7 @@ file=    use given config file
 	# Paths
 	if ! git config --get gitflow.path.hooks >/dev/null 2>&1 || flag force; then
 		DOT_GIT_DIR=$(git rev-parse --git-dir)
-		DOT_GIT_DIR=$(cd "$DOT_GIT_DIR" && pwd)
+		DOT_GIT_DIR=$(cd "$DOT_GIT_DIR" 2>&1 1>/dev/null && pwd)
 		default_suggestion=$(git config --get gitflow.path.hooks || echo "$DOT_GIT_DIR"/hooks)
 		printf "Hooks and filters directory? [$default_suggestion] "
 		if noflag defaults; then

@@ -39,25 +39,24 @@ initialize() {
 	require_git_repo
 	require_gitflow_initialized
 	gitflow_load_settings
-	PREFIX=$(git config --get gitflow.prefix.feature)
-	STORY_PREFIX=$(git config --get gitflow.prefix.story)
+	PREFIX=$(git config --get gitflow.prefix.story)
   FEATURE_BASE_BRANCH=$(git config --get gitflow.prefix.feature)
 }
 
 usage() {
 	OPTIONS_SPEC="\
-git flow feature [list]
-git flow feature start
-git flow feature finish
-git flow feature publish
-git flow feature track
-git flow feature diff
-git flow feature rebase
-git flow feature checkout
-git flow feature pull
-git flow feature delete
+git flow story list
+git flow story start
+git flow story finish
+git flow story publish
+git flow story track
+git flow story diff
+git flow story rebase
+git flow story checkout
+git flow story pull
+git flow story delete
 
-Manage your feature branches.
+Manage your story branches.
 
 For more specific help type the command followed by --help
 --
@@ -71,29 +70,31 @@ cmd_default() {
 
 cmd_list() {
 	OPTIONS_SPEC="\
-git flow feature [list] [-h] [-v]
+git flow story list <feature> [-h] [-v]
 
-Lists all the existing feature branches in the local repository.
+Lists all the existing story branches in the local repository.
 --
 h,help!     Show this help
 v,verbose   Verbose (more) output
 "
-	local feature_branches current_branch width branch len
-	local base master_sha branch_sha
+	local story_branches current_branch width branch len
+	local base feature_sha branch_sha
 
 	# Define flags
 	DEFINE_boolean 'verbose' false 'verbose (more) output' v
 
-	# Parse argun=ments
-	parse_args "$@"
+	# Parse arguments
+	parse_feature_name "$@"
 
-	feature_branches=$(git_local_branches_prefixed "$PREFIX" | grep -v "$STORY_PREFIX")
-	if [ -z "$feature_branches" ]; then
-		warn "No feature branches exist."
+  gitflow_require_feature_arg
+
+	story_branches=$(git_local_branches_prefixed "$FEATURE_BRANCH/$PREFIX")
+	if [ -z "$story_branches" ]; then
+		warn "No story branches exist."
 		warn ""
-		warn "You can start a new feature branch:"
+		warn "You can start a new story branch:"
 		warn ""
-		warn "    git flow feature start <name> [<base>]"
+		warn "    git flow story start <name> [<base>]"
 		warn ""
 		exit 0
 	fi
@@ -101,15 +102,15 @@ v,verbose   Verbose (more) output
 
 	# Determine column width first
 	width=0
-	for branch in $feature_branches; do
+	for branch in $story_branches; do
 		len=${#branch}
 		width=$(max $width $len)
 	done
 	width=$(($width+3-${#PREFIX}))
 
-	for branch in $feature_branches; do
-		base=$(git merge-base "$branch" "$MASTER_BRANCH")
-		master_sha=$(git rev-parse "$MASTER_BRANCH")
+	for branch in $story_branches; do
+		base=$(git merge-base "$branch" "$FEATURE_BRANCH")
+		feature_sha=$(git rev-parse "$FEATURE_BRANCH")
 		branch_sha=$(git rev-parse "$branch")
 		if [ "$branch" = "$current_branch" ]; then
 			printf "* "
@@ -118,12 +119,12 @@ v,verbose   Verbose (more) output
 		fi
 		if flag verbose; then
 			printf "%-${width}s" "${branch#$PREFIX}"
-			if [ "$branch_sha" = "$master_sha" ]; then
+			if [ "$branch_sha" = "$feature_sha" ]; then
 				printf "(no commits yet)"
 			elif [ "$base" = "$branch_sha" ]; then
-				printf "(is behind master, may ff)"
-			elif [ "$base" = "$master_sha" ]; then
-				printf "(based on latest master)"
+				printf "(is behind feature, may ff)"
+			elif [ "$base" = "$feature_sha" ]; then
+				printf "(based on latest feature)"
 			else
 				printf "(may be rebased)"
 			fi
@@ -150,22 +151,30 @@ parse_args() {
 	else
 		NAME=$1
 	fi
+	BRANCH=$FEATURE_PREFIX$FEATURE_NAME/$PREFIX$NAME
 
-  # Strip FEATURE_BASE_BRANCH off the end of the feature name if present
-  NAME=`echo "$NAME" | sed -re "s@/$FEATURE_BASE_BRANCH\\$@@g"`
-  BRANCH=$PREFIX$NAME/$FEATURE_BASE_BRANCH
+  gitflow_use_story_feature
 }
 
-parse_finish_args() {
-  parse_args "$@"
+parse_feature_name() {
+	FLAGS "$@" || exit $?
+	eval set -- "${FLAGS_ARGV}"
 
-  RELEASE_PREFIX=$(git config --get gitflow.prefix.release)
-	if [ -z $2 ]; then
-		RELEASE=''
+	# read arguments into global variables
+  FEATURE_PREFIX=$(git config --get gitflow.prefix.feature)
+	if [ -z $1 ]; then
+		FEATURE_NAME=''
 	else
-		RELEASE=$2
+		FEATURE_NAME=$1
 	fi
-  RELEASE_BRANCH=$RELEASE_PREFIX$RELEASE
+  FEATURE_BRANCH=$FEATURE_PREFIX$FEATURE_NAME/$FEATURE_BASE_BRANCH
+
+	if [ -z $2 ]; then
+		NAME=''
+	else
+		NAME=$2
+	fi
+	BRANCH=$FEATURE_PREFIX$FEATURE_NAME/$PREFIX$NAME
 }
 
 parse_remote_name() {
@@ -185,14 +194,14 @@ parse_remote_name() {
 	else
 		NAME=$2
 	fi
-	BRANCH=$PREFIX$NAME/FEATURE_BASE_BRANCH
+	BRANCH=$PREFIX$NAME
 }
 
 cmd_start() {
 	OPTIONS_SPEC="\
-git flow feature start [-h] [-F] <name> [<base>]
+git flow story start [-h] [-F] <feature> <name>
 
-Start new feature <name>, optionally basing it on <base> instead of <master>
+Start new story <name>, optionally basing it on <base> instead of <$FEATURE_BRANCH>
 --
 h,help!          Show this help
 showcommands!    Show git commands while executing them
@@ -203,16 +212,19 @@ F,[no]fetch      Fetch from origin before performing local operation
 
 	# Define flags
 	DEFINE_boolean 'fetch' false 'fetch from origin before performing local operation' F
-	DEFINE_boolean 'publish' true 'publish this feature after it is started'
+	DEFINE_boolean 'publish' true 'fetch from origin before performing local operation'
 
 	# Override defaults with values from config
-	gitflow_override_flag_boolean   "feature.start.fetch"   "fetch"
-	gitflow_override_flag_boolean   "feature.start.publish" "publish"
+	gitflow_override_flag_boolean   "story.start.fetch"   "fetch"
+	gitflow_override_flag_boolean   "story.start.publish" "publish"
 
 	# Parse arguments
-	parse_args "$@"
+	parse_feature_name "$@"
 	eval set -- "${FLAGS_ARGV}"
-	base=${2:-$MASTER_BRANCH}
+
+  gitflow_require_feature_arg
+
+	base=$FEATURE_BRANCH
 
 	require_base_is_local_branch "$base"
 	gitflow_require_name_arg
@@ -236,7 +248,7 @@ F,[no]fetch      Fetch from origin before performing local operation
 
 
 	# create branch
-	git_do checkout -b "$BRANCH" "$base" || die "Could not create feature branch '$BRANCH'."
+	git_do checkout -b "$BRANCH" "$base" || die "Could not create story branch '$BRANCH'."
 
 	run_post_hook "$NAME" "$ORIGIN" "$BRANCH" "$base"
 
@@ -245,9 +257,9 @@ F,[no]fetch      Fetch from origin before performing local operation
 	echo "- A new branch '$BRANCH' was created, based on '$base'"
 	echo "- You are now on branch '$(git_current_branch)'"
 	echo ""
-	echo "Now, start committing on your feature. When done, use:"
+	echo "Now, start committing on your story. When done, use:"
 	echo ""
-	echo "     git flow feature finish $NAME"
+	echo "     git flow story finish $NAME"
 	echo
 
   # Keeping both branches implies the --keep flag to be true.
@@ -258,9 +270,9 @@ F,[no]fetch      Fetch from origin before performing local operation
 
 cmd_finish() {
 	OPTIONS_SPEC="\
-git flow feature finish [-h] [-F] [-r] [-p] [-k] [-D] [-S] [--no-ff] <name|nameprefix> <release>
+git flow story finish [-h] [-F] [-r] [-p] [-k] [-D] [-S] [--no-ff] <name|nameprefix>
 
-Finish feature <name>
+Finish story <name>
 --
 h,help!                Show this help
 showcommands!          Show git commands while executing them
@@ -271,8 +283,8 @@ P,[no]push             Push to origin after performing finish
 k,[no]keep             Keep branch after performing finish
 keepremote!        	   Keep the remote branch
 keeplocal!             Keep the local branch
-D,[no]force_delete     Force delete feature branch after finish
-S,[no]squash           Squash feature during merge
+D,[no]force_delete     Force delete story branch after finish
+S,[no]squash           Squash story during merge
 no-ff!                 Never fast-forward during the merge
 "
 	local finish_base
@@ -281,39 +293,38 @@ no-ff!                 Never fast-forward during the merge
 	DEFINE_boolean 'fetch' false "fetch from $ORIGIN before performing finish" F
 	DEFINE_boolean 'rebase' false "rebase before merging" r
 	DEFINE_boolean 'preserve-merges' false 'try to recreate merges while rebasing' p
-	DEFINE_boolean 'push' true 'push to $ORIGIN after performing finish' P
+  DEFINE_boolean 'push' true 'push to $ORIGIN after performing finish' P
 	DEFINE_boolean 'keep' false "keep branch after performing finish" k
 	DEFINE_boolean 'keepremote' false "keep the remote branch"
 	DEFINE_boolean 'keeplocal' false "keep the local branch"
-	DEFINE_boolean 'force_delete' false "force delete feature branch after finish" D
-	DEFINE_boolean 'squash' false "squash feature during merge" S
+	DEFINE_boolean 'force_delete' false "force delete story branch after finish" D
+	DEFINE_boolean 'squash' false "squash story during merge" S
 	DEFINE_boolean 'squash-info' false "add branch info during squash"
 	DEFINE_boolean 'no-ff!' false "Don't fast-forward ever during merge "
 
 	# Override defaults with values from config
-	gitflow_override_flag_boolean   "feature.finish.fetch"             "fetch"
-	gitflow_override_flag_boolean   "feature.finish.rebase"            "rebase"
-	gitflow_override_flag_boolean   "feature.finish.preserve-merges"   "preserve_merges"
-	gitflow_override_flag_boolean   "feature.finish.push"              "push"
-	gitflow_override_flag_boolean   "feature.finish.keep"              "keep"
-	gitflow_override_flag_boolean   "feature.finish.keepremote"        "keepremote"
-	gitflow_override_flag_boolean   "feature.finish.keeplocal"         "keeplocal"
-	gitflow_override_flag_boolean   "feature.finish.force-delete"      "force_delete"
-	gitflow_override_flag_boolean   "feature.finish.squash"            "squash"
-	gitflow_override_flag_boolean   "feature.finish.squash-info"       "squash_info"
-	gitflow_override_flag_boolean   "feature.finish.no-ff"             "no_ff"
+	gitflow_override_flag_boolean   "story.finish.fetch"             "fetch"
+	gitflow_override_flag_boolean   "story.finish.rebase"            "rebase"
+	gitflow_override_flag_boolean   "story.finish.preserve-merges"   "preserve_merges"
+  gitflow_override_flag_boolean   "feature.finish.push"              "push"
+	gitflow_override_flag_boolean   "story.finish.keep"              "keep"
+	gitflow_override_flag_boolean   "story.finish.keepremote"        "keepremote"
+	gitflow_override_flag_boolean   "story.finish.keeplocal"         "keeplocal"
+	gitflow_override_flag_boolean   "story.finish.force-delete"      "force_delete"
+	gitflow_override_flag_boolean   "story.finish.squash"            "squash"
+	gitflow_override_flag_boolean   "story.finish.squash-info"       "squash_info"
+	gitflow_override_flag_boolean   "story.finish.no-ff"             "no_ff"
 
 	# Parse arguments
-	parse_finish_args "$@"
+	parse_args "$@"
 
 	# Use current branch if no name is given
 	if [ "$NAME" = "" ]; then
 		gitflow_use_current_branch_name
 	fi
 
-  if [ "$RELEASE" = "" ]; then
-    die "Must specify a release to merge this feature in to"
-  fi
+  # Use the feature of the current branch
+  gitflow_use_story_feature
 
 	# Keeping both branches implies the --keep flag to be true.
 	if flag keepremote && flag keeplocal; then
@@ -322,10 +333,10 @@ no-ff!                 Never fast-forward during the merge
 
 	# Sanity checks
 	require_branch "$BRANCH"
-  require_branch "$RELEASE_BRANCH"
 
-	BASE_BRANCH=$RELEASE_BRANCH
-	git_local_branch_exists "$BASE_BRANCH" || die "The base '$BASE_BRANCH' doesn't exists locally or is not a branch. Can't finish the feature branch '$BRANCH'."
+	BASE_BRANCH=$(gitflow_config_get_base_branch $BRANCH)
+	BASE_BRANCH=${BASE_BRANCH:-$FEATURE_BRANCH}
+	git_local_branch_exists "$BASE_BRANCH" || die "The base '$BASE_BRANCH' doesn't exists locally or is not a branch. Can't finish the story branch '$BRANCH'."
 
 	# Detect if we're restoring from a merge conflict
 	if [ -f "$DOT_GIT_DIR/.gitflow/MERGE_BASE" ]; then
@@ -362,7 +373,7 @@ no-ff!                 Never fast-forward during the merge
 			echo "    git commit"
 			echo
 			echo "You can then complete the finish by running it again:"
-			echo "    git flow feature finish $NAME"
+			echo "    git flow story finish $NAME"
 			echo
 			exit 1
 		fi
@@ -402,11 +413,11 @@ no-ff!                 Never fast-forward during the merge
         if flag showcommands; then
             _rebase_opts="$_rebase_opts --showcommands"
         fi
-		if ! git flow feature rebase $_rebase_opts "$NAME"; then
+		if ! git flow story rebase $_rebase_opts "$NAME"; then
 			warn "Finish was aborted due to conflicts during rebase."
 			warn "Please finish the rebase manually now."
 			warn "When finished, re-run:"
-			warn "    git flow feature finish '$NAME' '$BASE_BRANCH'"
+			warn "    git flow story finish '$NAME' '$BASE_BRANCH'"
 			exit 1
 		fi
 	fi
@@ -426,7 +437,7 @@ no-ff!                 Never fast-forward during the merge
 		fi
 	else
 		git_do merge --squash "$BRANCH"
-		flag squash_info && gitflow_create_squash_message "Merged feature branch '$BRANCH'" "$BASE_BRANCH" "$BRANCH" > "$DOT_GIT_DIR/SQUASH_MSG"
+		flag squash_info && gitflow_create_squash_message "Merged story branch '$BRANCH'" "$BASE_BRANCH" "$BRANCH" > "$DOT_GIT_DIR/SQUASH_MSG"
 		git_do commit
 	fi
 
@@ -442,7 +453,7 @@ no-ff!                 Never fast-forward during the merge
 		echo "    git commit"
 		echo
 		echo "You can then complete the finish by running it again:"
-		echo "    git flow feature finish $NAME"
+		echo "    git flow story finish $NAME"
 		echo
 		exit 1
 	fi
@@ -453,7 +464,7 @@ no-ff!                 Never fast-forward during the merge
 
 	run_post_hook "$NAME" "$ORIGIN" "$BRANCH"
 
-	# When no merge conflict is detected, just clean up the feature branch
+	# When no merge conflict is detected, just clean up the story branch
 	gitflow_config_remove_base_branch "$BRANCH"
 	helper_finish_cleanup
 }
@@ -501,7 +512,7 @@ helper_finish_cleanup() {
 
 	echo
 	echo "Summary of actions:"
-	echo "- The feature branch '$BRANCH' was merged into '$BASE_BRANCH'"
+	echo "- The story branch '$BRANCH' was merged into '$BASE_BRANCH'"
 	#echo "- Merge conflicts were resolved"		# TODO: Add this line when it's supported
 	if noflag keep; then
 		if [ $localbranchdeleted -eq $FLAGS_TRUE ]; then
@@ -520,20 +531,20 @@ helper_finish_cleanup() {
 			keepmsg=$keepmsg"; it is still remotely available on '$ORIGIN'"
 		fi
 	fi
-	echo "- Feature branch '$BRANCH' "$keepmsg
   if flag push; then
     echo "- '$BASE_BRANCH' has been pushed to '$ORIGIN'"
   fi
+	echo "- story branch '$BRANCH' "$keepmsg
 	echo "- You are now on branch '$(git_current_branch)'"
 	echo
 }
 
 cmd_publish() {
 	OPTIONS_SPEC="\
-git flow feature publish [-h] [<name>]
+git flow story publish [-h] [<name>]
 
-Publish feature branch <name> on $ORIGIN.
-When <name> is omitted the current branch is used, but only if it's a feature branch.
+Publish story branch <name> on $ORIGIN.
+When <name> is omitted the current branch is used, but only if it's a story branch.
 --
 h,help!          Show this help
 showcommands!    Show git commands while executing them
@@ -546,6 +557,8 @@ showcommands!    Show git commands while executing them
 		gitflow_use_current_branch_name
 	fi
 
+  # Use the feature of the current branch
+  gitflow_use_story_feature
 
 	# Sanity checks
 	require_clean_working_tree
@@ -576,9 +589,9 @@ showcommands!    Show git commands while executing them
 
 cmd_track() {
 	OPTIONS_SPEC="\
-git flow feature track [-h] <name>
+git flow story track [-h] <name>
 
-Start tracking feature <name> that is shared on $ORIGIN
+Start tracking story <name> that is shared on $ORIGIN
 --
 h,help!          Show this help
 showcommands!    Show git commands while executing them
@@ -611,9 +624,9 @@ showcommands!    Show git commands while executing them
 
 cmd_diff() {
 	OPTIONS_SPEC="\
-git flow feature diff [-h] [<name|nameprefix>]
+git flow story diff [-h] [feature] [<name|nameprefix>]
 
-Show all changes in <name> that are not in the base
+Show all changes in <name> that are not in the feature
 --
 h,help!          Show this help
 showcommands!    Show git commands while executing them
@@ -621,24 +634,29 @@ showcommands!    Show git commands while executing them
 	local base
 
 	# Parse arguments
-	parse_args "$@"
+	parse_feature_name "$@"
 
 	# Use current branch if no name is given
 	if [ "$NAME" = "" ]; then
 		gitflow_use_current_branch_name
 	fi
 
+  # Use the feature of the current branch if no feature is given
+	if [ "$FEATURE_NAME" = "" ]; then
+    gitflow_use_story_feature
+	fi
+
 	base=$(gitflow_config_get_base_branch $BRANCH)
-	base=${base:-$MASTER_BRANCH}
+	base=${base:-$FEATURE_BRANCH}
 
 	git_do diff "$base..$BRANCH"
 }
 
 cmd_checkout() {
 	OPTIONS_SPEC="\
-git flow feature checkout [-h] [<name|nameprefix>]
+git flow story checkout [-h] <name|nameprefix>
 
-Switch to feature branch <name>
+Switch to story branch <name>
 --
 h,help!          Show this help
 showcommands!    Show git commands while executing them
@@ -646,7 +664,7 @@ showcommands!    Show git commands while executing them
 	# Parse arguments
 	parse_args "$@"
 
-	warn "The command 'git flow feature checkout/co' will be deprecated per version 2.0.0"
+	warn "The command 'git flow story checkout/co' will be deprecated per version 2.0.0"
 	gitflow_require_name_arg
 
 	git_do checkout "$BRANCH"  || die "Could not check out branch '$BRANCH'."
@@ -659,7 +677,7 @@ cmd_co() {
 
 cmd_rebase() {
 	OPTIONS_SPEC="\
-git flow feature rebase [-h] [-i] [-p] [<name|nameprefix>]
+git flow story rebase [-h] [-i] [-p] [<name|nameprefix>]
 
 Rebase <name> on <base_branch>
 --
@@ -675,8 +693,8 @@ p,[no]preserve-merges  Preserve merges
 	DEFINE_boolean 'preserve-merges' false 'try to recreate merges' p
 
 	# Override defaults with values from config
-	gitflow_override_flag_boolean   "feature.rebase.interactive"       "interactive"
-	gitflow_override_flag_boolean   "feature.rebase.preserve-merges"   "preserve_merges"
+	gitflow_override_flag_boolean   "story.rebase.interactive"       "interactive"
+	gitflow_override_flag_boolean   "story.rebase.preserve-merges"   "preserve_merges"
 
 	# Parse arguments
 	parse_args "$@"
@@ -686,15 +704,17 @@ p,[no]preserve-merges  Preserve merges
 		gitflow_use_current_branch_name
 	fi
 
+  # Use the feature of the current branch
+  gitflow_use_story_feature
 
 	BASE_BRANCH=$(gitflow_config_get_base_branch $BRANCH)
-	BASE_BRANCH=${BASE_BRANCH:-$MASTER_BRANCH}
+	BASE_BRANCH=${BASE_BRANCH:-$FEATURE_BRANCH}
 
 	warn "Will try to rebase '$NAME' which is based on '$BASE_BRANCH'..."
 	require_clean_working_tree
 	require_branch "$BRANCH"
 
-    git_local_branch_exists "$BASE_BRANCH" || die "The base '$BASE_BRANCH' doesn't exists locally or is not a branch. Can't rebase the feature branch '$BRANCH'."
+    git_local_branch_exists "$BASE_BRANCH" || die "The base '$BASE_BRANCH' doesn't exists locally or is not a branch. Can't rebase the story branch '$BRANCH'."
 
 	git_do checkout -q "$BRANCH"  || die "Could not check out branch '$BRANCH'."
 	if flag interactive; then
@@ -720,9 +740,9 @@ avoid_accidental_cross_branch_action() {
 
 cmd_pull() {
 	OPTIONS_SPEC="\
-git flow feature pull [-h] <remote> [<name>]
+git flow story pull [-h] <remote> [<name>]
 
-Pull feature <name> from <remote>
+Pull story <name> from <remote>
 --
 h,help!          Show this help
 showcommands!    Show git commands while executing them
@@ -732,7 +752,7 @@ showcommands!    Show git commands while executing them
 	# Define flags
 	DEFINE_boolean 'rebase' false "pull with rebase" r
 
-	warn "The command 'git flow feature pull' will be deprecated per version 2.0.0"
+	warn "The command 'git flow story pull' will be deprecated per version 2.0.0"
 
 	# Parse arguments
 	parse_remote_name "$@"
@@ -746,12 +766,12 @@ showcommands!    Show git commands while executing them
 		gitflow_use_current_branch_name
 	fi
 
-	# To avoid accidentally merging different feature branches into each other,
-	# die if the current feature branch differs from the requested $NAME
+	# To avoid accidentally merging different story branches into each other,
+	# die if the current story branch differs from the requested $NAME
 	# argument.
 	current_branch=$(git_current_branch)
 	if startswith "$current_branch" "$PREFIX"; then
-		# We are on a local feature branch already, so $BRANCH must be equal to
+		# We are on a local story branch already, so $BRANCH must be equal to
 		# the current branch
 		avoid_accidental_cross_branch_action || die
 	fi
@@ -789,9 +809,9 @@ showcommands!    Show git commands while executing them
 
 cmd_delete() {
 	OPTIONS_SPEC="\
-git flow feature delete [-h] [-f] [-r] <name>
+git flow story delete [-h] [-f] [-r] <name>
 
-Delete a given feature branch
+Delete a given story branch
 --
 h,help!          Show this help
 showcommands!    Show git commands while executing them
@@ -805,8 +825,8 @@ r,[no]remote     Delete remote branch
 	DEFINE_boolean 'remote' false "delete remote branch" r
 
 	# Override defaults with values from config
-	gitflow_override_flag_boolean   "feature.delete.force"    "force"
-	gitflow_override_flag_boolean   "feature.delete.remote"   "remote"
+	gitflow_override_flag_boolean   "story.delete.force"    "force"
+	gitflow_override_flag_boolean   "story.delete.remote"   "remote"
 
 	# Parse arguments
 	parse_args "$@"
@@ -819,13 +839,13 @@ r,[no]remote     Delete remote branch
 	run_pre_hook "$NAME" "$ORIGIN" "$BRANCH"
 
 	current_branch=$(git_current_branch)
-	# We can't delete a branch we are on, switch to the master branch.
+	# We can't delete a branch we are on, switch to the feature branch.
 	if [ "$BRANCH" = "$current_branch" ]; then
 		require_clean_working_tree
-		git_do checkout "$MASTER_BRANCH" || die "Could not check out branch '$MASTER_BRANCH'."
+		git_do checkout "$FEATURE_BRANCH" || die "Could not check out branch '$FEATURE_BRANCH'."
 	fi
 
-	if git_is_branch_merged_into "$BRANCH" "$MASTER_BRANCH"; then
+	if git_is_branch_merged_into "$BRANCH" "$FEATURE_BRANCH"; then
 		git_do branch -d "$BRANCH" || die "Could not delete the $BRANCH."
 		if flag remote; then
 			git_do push "$ORIGIN" :"$BRANCH" || die "Could not delete the remote $BRANCH in $ORIGIN."
@@ -837,7 +857,7 @@ r,[no]remote     Delete remote branch
 				git_do push "$ORIGIN" :"$BRANCH" || die "Could not delete the remote $BRANCH in $ORIGIN."
 			fi
 		else
-			die "Feature branch '$BRANCH' has been not been merged yet. Use -f to force the deletion."
+			die "Story branch '$BRANCH' has been not been merged yet. Use -f to force the deletion."
 		fi
 	fi
 
@@ -846,8 +866,8 @@ r,[no]remote     Delete remote branch
 
 	echo
 	echo "Summary of actions:"
-	echo "- Feature branch '$BRANCH' has been deleted."
-	flag remote && echo "- Feature branch '$BRANCH' in '$ORIGIN' has been deleted."
+	echo "- Story branch '$BRANCH' has been deleted."
+	flag remote && echo "- Story branch '$BRANCH' in '$ORIGIN' has been deleted."
 	echo "- You are now on branch '$(git_current_branch)'"
 	echo
 }

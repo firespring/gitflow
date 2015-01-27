@@ -23,6 +23,14 @@
  
 # Changelog
 
+#### x.x
+[Joe Ebmeier][jebmeier]
+* Allow multiple release branches
+* Remove 'develop' branch references
+* Feature branch is now actually a 'develop' branch under the feature name
+* Stories are sub-features and are branched off of the feature's develop branch
+
+
 #### 1.8.0
 [Peter van der Does][petervanderdoes]
 * Add rebase action to release, hotfix and support.
