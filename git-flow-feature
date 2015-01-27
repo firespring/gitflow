@@ -41,7 +41,7 @@ initialize() {
 	gitflow_load_settings
 	PREFIX=$(git config --get gitflow.prefix.feature)
 	STORY_PREFIX=$(git config --get gitflow.prefix.story)
-  FEATURE_BASE_BRANCH=$(git config --get gitflow.prefix.feature)
+  FEATURE_BASE_BRANCH=$(git config --get gitflow.branch.feature.base)
 }
 
 usage() {
@@ -256,6 +256,13 @@ F,[no]fetch      Fetch from origin before performing local operation
   fi
 }
 
+require_no_story_branches() {
+  story_branches=$(git_local_branches_prefixed "$PREFIX$NAME/$STORY_PREFIX*")
+  if [ "$story_branches" != "" ]; then
+    die "Found unfinished story branches: $story_branches"
+  fi
+}
+
 cmd_finish() {
 	OPTIONS_SPEC="\
 git flow feature finish [-h] [-F] [-r] [-p] [-k] [-D] [-S] [--no-ff] <name|nameprefix> <release>
@@ -323,6 +330,7 @@ no-ff!                 Never fast-forward during the merge
 	# Sanity checks
 	require_branch "$BRANCH"
   require_branch "$RELEASE_BRANCH"
+  require_no_story_branches
 
 	BASE_BRANCH=$RELEASE_BRANCH
 	git_local_branch_exists "$BASE_BRANCH" || die "The base '$BASE_BRANCH' doesn't exists locally or is not a branch. Can't finish the feature branch '$BRANCH'."
@@ -815,6 +823,7 @@ r,[no]remote     Delete remote branch
 
 	# Sanity checks
 	require_branch "$BRANCH"
+  require_no_story_branches
 
 	run_pre_hook "$NAME" "$ORIGIN" "$BRANCH"
 

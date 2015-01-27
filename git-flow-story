@@ -40,7 +40,8 @@ initialize() {
 	require_gitflow_initialized
 	gitflow_load_settings
 	PREFIX=$(git config --get gitflow.prefix.story)
-  FEATURE_BASE_BRANCH=$(git config --get gitflow.prefix.feature)
+  FEATURE_PREFIX=$(git config --get gitflow.prefix.feature)
+  FEATURE_BASE_BRANCH=$(git config --get gitflow.branch.feature.base)
 }
 
 usage() {
@@ -152,8 +153,6 @@ parse_args() {
 		NAME=$1
 	fi
 	BRANCH=$FEATURE_PREFIX$FEATURE_NAME/$PREFIX$NAME
-
-  gitflow_use_story_feature
 }
 
 parse_feature_name() {
@@ -161,7 +160,6 @@ parse_feature_name() {
 	eval set -- "${FLAGS_ARGV}"
 
 	# read arguments into global variables
-  FEATURE_PREFIX=$(git config --get gitflow.prefix.feature)
 	if [ -z $1 ]; then
 		FEATURE_NAME=''
 	else
@@ -601,6 +599,9 @@ showcommands!    Show git commands while executing them
 
 	gitflow_require_name_arg
 
+  # Use the feature of the current branch
+  gitflow_use_story_feature
+
 	# Sanity checks
 	require_clean_working_tree
 	require_local_branch_absent "$BRANCH"
@@ -666,6 +667,9 @@ showcommands!    Show git commands while executing them
 
 	warn "The command 'git flow story checkout/co' will be deprecated per version 2.0.0"
 	gitflow_require_name_arg
+
+  # Use the feature of the current branch
+  gitflow_use_story_feature
 
 	git_do checkout "$BRANCH"  || die "Could not check out branch '$BRANCH'."
 }
@@ -832,6 +836,9 @@ r,[no]remote     Delete remote branch
 	parse_args "$@"
 
 	gitflow_require_name_arg
+
+  # Use the feature of the current branch
+  gitflow_use_story_feature
 
 	# Sanity checks
 	require_branch "$BRANCH"

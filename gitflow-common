@@ -575,7 +575,7 @@ gitflow_use_current_branch_name() {
 }
 
 gitflow_use_story_feature() {
-  local story_branches story_branch
+  local story_branch
 
   story_branch=$(git_local_branches_prefixed "*/*/$PREFIX$NAME")
   if [ -z $story_branch ]; then
