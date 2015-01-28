@@ -42,6 +42,7 @@ initialize() {
 	PREFIX=$(git config --get gitflow.prefix.feature)
 	STORY_PREFIX=$(git config --get gitflow.prefix.story)
   FEATURE_BASE_BRANCH=$(git config --get gitflow.branch.feature.base)
+  RELEASE_PREFIX=$(git config --get gitflow.prefix.release)
 }
 
 usage() {
@@ -157,9 +158,20 @@ parse_args() {
 }
 
 parse_finish_args() {
-  parse_args "$@"
+	FLAGS "$@" || exit $?
+	eval set -- "${FLAGS_ARGV}"
 
-  RELEASE_PREFIX=$(git config --get gitflow.prefix.release)
+	# read arguments into global variables
+	if [ -z $1 ]; then
+		NAME=''
+	else
+		NAME=$1
+	fi
+
+  # Strip FEATURE_BASE_BRANCH off the end of the feature name if present
+  NAME=`echo "$NAME" | sed -re "s@/$FEATURE_BASE_BRANCH\\$@@g"`
+  BRANCH=$PREFIX$NAME/$FEATURE_BASE_BRANCH
+
 	if [ -z $2 ]; then
 		RELEASE=''
 	else
@@ -330,7 +342,11 @@ no-ff!                 Never fast-forward during the merge
 	# Sanity checks
 	require_branch "$BRANCH"
   require_branch "$RELEASE_BRANCH"
-  require_no_story_branches
+
+  # Require all story branches have been closed if we are removing the branches
+	if noflag keep; then
+    require_no_story_branches
+  fi
 
 	BASE_BRANCH=$RELEASE_BRANCH
 	git_local_branch_exists "$BASE_BRANCH" || die "The base '$BASE_BRANCH' doesn't exists locally or is not a branch. Can't finish the feature branch '$BRANCH'."
@@ -654,7 +670,6 @@ showcommands!    Show git commands while executing them
 	# Parse arguments
 	parse_args "$@"
 
-	warn "The command 'git flow feature checkout/co' will be deprecated per version 2.0.0"
 	gitflow_require_name_arg
 
 	git_do checkout "$BRANCH"  || die "Could not check out branch '$BRANCH'."
@@ -694,7 +709,6 @@ p,[no]preserve-merges  Preserve merges
 		gitflow_use_current_branch_name
 	fi
 
-
 	BASE_BRANCH=$(gitflow_config_get_base_branch $BRANCH)
 	BASE_BRANCH=${BASE_BRANCH:-$MASTER_BRANCH}
 
@@ -702,7 +716,7 @@ p,[no]preserve-merges  Preserve merges
 	require_clean_working_tree
 	require_branch "$BRANCH"
 
-    git_local_branch_exists "$BASE_BRANCH" || die "The base '$BASE_BRANCH' doesn't exists locally or is not a branch. Can't rebase the feature branch '$BRANCH'."
+  git_local_branch_exists "$BASE_BRANCH" || die "The base '$BASE_BRANCH' doesn't exists locally or is not a branch. Can't rebase the feature branch '$BRANCH'."
 
 	git_do checkout -q "$BRANCH"  || die "Could not check out branch '$BRANCH'."
 	if flag interactive; then
