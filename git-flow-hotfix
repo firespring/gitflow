@@ -47,6 +47,7 @@ usage() {
 	OPTIONS_SPEC="\
 git flow hotfix [list]
 git flow hotfix start
+git flow hotfix checkout
 git flow hotfix finish
 git flow hotfix publish
 git flow hotfix delete
@@ -361,6 +362,28 @@ showcommands!     Show git commands while executing them
 	echo "- A new remote tracking branch '$BRANCH' was created"
 	echo "- You are now on branch '$BRANCH'"
 	echo
+}
+
+cmd_checkout() {
+	OPTIONS_SPEC="\
+git flow hotfix checkout [-h] <name>
+
+Switch to hotfix branch <name>
+--
+h,help!          Show this help
+showcommands!    Show git commands while executing them
+"
+	# Parse arguments
+	parse_args "$@"
+
+	gitflow_require_version_arg
+
+	git_do checkout "$BRANCH"  || die "Could not check out branch '$BRANCH'."
+}
+
+cmd_co() {
+	# Alias for checkout
+	cmd_checkout "$@"
 }
 
 cmd_finish() {

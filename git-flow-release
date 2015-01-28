@@ -357,6 +357,7 @@ usage() {
 		OPTIONS_SPEC="\
 git flow release [list]
 git flow release start
+git flow release checkout
 git flow release finish
 git flow release publish
 git flow release track
@@ -548,6 +549,28 @@ v,verbose!           Verbose (more) output
   if flag publish; then
     cmd_publish $NAME
   fi
+}
+
+cmd_checkout() {
+	OPTIONS_SPEC="\
+git flow release checkout [-h] <name>
+
+Switch to release branch <name>
+--
+h,help!          Show this help
+showcommands!    Show git commands while executing them
+"
+	# Parse arguments
+	parse_args "$@"
+
+	gitflow_require_version_arg
+
+	git_do checkout "$BRANCH"  || die "Could not check out branch '$BRANCH'."
+}
+
+cmd_co() {
+	# Alias for checkout
+	cmd_checkout "$@"
 }
 
 cmd_finish() {
