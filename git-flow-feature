@@ -208,13 +208,13 @@ Start new feature <name>, optionally basing it on <base> instead of <master>
 --
 h,help!          Show this help
 showcommands!    Show git commands while executing them
-F,[no]fetch      Fetch from origin before performing local operation
+F,[no]fetch      Fetch from $ORIGIN before performing local operation
 [no]publish      Publish this feature after it is started
 "
 	local base
 
 	# Define flags
-	DEFINE_boolean 'fetch' false 'fetch from origin before performing local operation' F
+	DEFINE_boolean 'fetch' true 'fetch from $ORIGIN before performing local operation' F
 	DEFINE_boolean 'publish' true 'publish this feature after it is started'
 
 	# Override defaults with values from config
@@ -283,10 +283,10 @@ Finish feature <name>
 --
 h,help!                Show this help
 showcommands!          Show git commands while executing them
-F,[no]fetch            Fetch from origin before performing finish
+F,[no]fetch            Fetch from $ORIGIN before performing finish
 r,[no]rebase           Rebase before merging
 p,[no]preserve-merges  Preserve merges while rebasing
-P,[no]push             Push to origin after performing finish
+P,[no]push             Push to $ORIGIN after performing finish
 k,[no]keep             Keep branch after performing finish
 keepremote!        	   Keep the remote branch
 keeplocal!             Keep the local branch

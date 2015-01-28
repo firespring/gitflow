@@ -168,13 +168,13 @@ Start new hotfix branch named <version>, optionally base it on <base> instead of
 --
 h,help!           Show this help
 showcommands!     Show git commands while executing them
-F,[no]fetch       Fetch from origin before performing local operation
+F,[no]fetch       Fetch from $ORIGIN before performing local operation
 [no]publish        Publish this release after it is started
 "
 	local base
 
 	# Define flags
-	DEFINE_boolean 'fetch' false "fetch from $ORIGIN before performing finish" F
+	DEFINE_boolean 'fetch' true "fetch from $ORIGIN before performing local operation" F
   DEFINE_boolean 'publish' true "publish this release after it is started"
 
 	# Override defaults with values from config
@@ -371,12 +371,12 @@ Finish hotfix branch <version>
 --
 h,help!               Show this help
 showcommands!         Show git commands while executing them
-F,[no]fetch           Fetch from origin before performing finish
+F,[no]fetch           Fetch from $ORIGIN before performing finish
 s,[no]sign            Sign the release tag cryptographically
 u,[no]signingkey      Use the given GPG-key for the digital signature (implies -s)
 m,[no]message         Use the given tag message
 f,[no]messagefile=    Use the contents of the given file as tag message
-p,[no]push            Push to origin after performing finish
+p,[no]push            Push to $ORIGIN after performing finish
 k,[no]keep            Keep branch after performing finish
 [no]keepremote        Keep the remote branch
 [no]keeplocal         Keep the local branch
