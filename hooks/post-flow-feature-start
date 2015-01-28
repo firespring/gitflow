@@ -19,5 +19,7 @@ BRANCH=$3
 BASE=$4
 
 # Implement your script here.
+FEATURE_NUMBER=`echo $NAME | grep -o -E '([0-9]+)'`
+curl --silent --user USERNAME:PASSWORD https://sbf.tpondemand.com/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data '{EntityState: {Id: 58}}'
 
 exit 0
