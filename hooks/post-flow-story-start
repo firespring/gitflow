@@ -18,8 +18,14 @@ ORIGIN=$2
 BRANCH=$3
 BASE=$4
 
-# Implement your script here.
-STORY_NUMBER=`echo $BRANCH | grep -o -E '([0-9]+)$'`
-curl --silent --user USERNAME:PASSWORD https://sbf.tpondemand.com/api/v1/UserStories/$STORY_NUMBER --request POST --header "Content-Type: application/json" --data '{EntityState: {Id: 47}}'
+if [ -f ~/.env ]; then
+  . ~/.env
+
+  if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
+    # Implement your script here.
+    STORY_NUMBER=`echo $BRANCH | grep -o -E '([0-9]+)$'`
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --request POST --header "Content-Type: application/json" --data '{EntityState: {Id: 47}}' >> /tmp/git-flow.hooks.log 2>&1
+  fi
+fi
 
 exit 0

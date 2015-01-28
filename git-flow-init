@@ -300,7 +300,7 @@ file=    use given config file
 	if ! git config --get gitflow.path.hooks >/dev/null 2>&1 || flag force; then
 		DOT_GIT_DIR=$(git rev-parse --git-dir)
 		DOT_GIT_DIR=$(cd "$DOT_GIT_DIR" 2>&1 1>/dev/null && pwd)
-		default_suggestion=$(git config --get gitflow.path.hooks || echo "$DOT_GIT_DIR"/hooks)
+		default_suggestion=$(git config --get gitflow.path.hooks || echo "/usr/local/share/doc/gitflow/hooks")
 		printf "Hooks and filters directory? [$default_suggestion] "
 		if noflag defaults; then
 			read answer
