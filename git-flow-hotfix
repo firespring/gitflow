@@ -381,7 +381,7 @@ k,[no]keep            Keep branch after performing finish
 [no]keepremote        Keep the remote branch
 [no]keeplocal         Keep the local branch
 D,[no]force_delete    Force delete hotfix branch after finish
-n,[no]notag           Don't tag this hotfix
+n,[no]tag           Don't tag this hotfix
 "
 	local opts commit keepmsg remotebranchdeleted localbranchdeleted
 
@@ -396,7 +396,7 @@ n,[no]notag           Don't tag this hotfix
 	DEFINE_boolean 'keepremote' false "keep the remote branch"
 	DEFINE_boolean 'keeplocal' false "keep the local branch"
 	DEFINE_boolean 'force_delete' false "force delete hotfix branch after finish" D
-	DEFINE_boolean 'notag' false "don't tag this hotfix" n
+	DEFINE_boolean 'notag' true "don't tag this hotfix" n
 
 	# Override defaults with values from config
 	gitflow_override_flag_boolean   "hotfix.finish.fetch"          "fetch"

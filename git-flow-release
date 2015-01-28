@@ -584,7 +584,7 @@ S,[no]squash        Squash release during merge
 	DEFINE_boolean 'keepremote' false "keep the remote branch"
 	DEFINE_boolean 'keeplocal' false "keep the local branch"
 	DEFINE_boolean 'force_delete' false "force delete release branch after finish" D
-	DEFINE_boolean 'notag' false "don't tag this release" n
+	DEFINE_boolean 'notag' true "don't tag this release" n
 	DEFINE_boolean 'nobackmerge' false "don't back-merge $MASTER_BRANCH, or tag if applicable" b
 	DEFINE_boolean 'squash' false "squash release during merge" S
 	DEFINE_boolean 'squash-info' false "add branch info during squash"
@@ -681,7 +681,7 @@ S,[no]squash 		Squash release during merge
 	DEFINE_string 'message' "" "use the given tag message" m
 	DEFINE_string 'messagefile' "" "use the contents of the given file as a tag message" f
 	DEFINE_boolean 'push' false "push to $ORIGIN after performing finish" p
-	DEFINE_boolean 'notag' false "don't tag this release" n
+	DEFINE_boolean 'notag' true "don't tag this release" n
 	DEFINE_boolean 'squash' false "squash release during merge" S
 	DEFINE_boolean 'squash-info' false "add branch info during squash"
 
