@@ -584,8 +584,8 @@ gitflow_use_story_feature() {
   fi
 
   FEATURE_NAME=`echo $story_branch | cut -d '/' -f 2`
-  FEATURE_BRANCH=$FEATURE_PREFIX$FEATURE_NAME
-  BRANCH=$FEATURE_BRANCH/$PREFIX$NAME
+  FEATURE_BRANCH=$FEATURE_PREFIX$FEATURE_NAME/$FEATURE_BASE_BRANCH
+  BRANCH=$FEATURE_PREFIX$FEATURE_NAME/$PREFIX$NAME
 }
 
 gitflow_use_current_branch_version() {

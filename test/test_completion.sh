@@ -13,14 +13,8 @@ test_feature_completion()
   COMP_WORDS=( git flow feature )
   test_completion_matches "list start finish publish track diff rebase checkout pull help delete"
 
-  COMP_WORDS=( git flow feature finish )
-  test_completion_matches ""
-
   # Create a feature so we can find it with auto-completion
   git flow feature start $FEATURE1
-
-  COMP_WORDS=( git flow feature finish '' )
-  test_completion_matches "$FEATURE1"
 
   COMP_WORDS=( git flow feature checkout '' )
   test_completion_matches "$FEATURE1"
@@ -31,14 +25,56 @@ test_feature_completion()
   COMP_WORDS=( git flow feature delete '' )
   test_completion_matches "$FEATURE1"
 
+  COMP_WORDS=( git flow feature finish '' )
+  test_completion_matches "$FEATURE1"
+
   # Create a release so we can find it with auto-completion
   git flow release start $RELEASE1
 
   COMP_WORDS=( git flow feature finish $FEATURE1 '' )
   test_completion_matches "$RELEASE1"
 
-  git flow feature finish $FEATURE1 $RELEASE1
-  git flow release finish $RELEASE1
+  git flow feature delete $FEATURE1 $RELEASE1
+  git flow release delete $RELEASE1
+
+  echo "--------------------- DONE ---------------------------"
+}
+
+test_story_completion()
+{
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "----------- TESTING STORY COMPLETION -----------------"
+  echo "------------------------------------------------------"
+
+  # Create a release so we can find it with auto-completion
+  git flow feature start $FEATURE1
+  git flow feature start $FEATURE2
+
+  COMP_WORDS=( git flow story list '' )
+  test_completion_matches "$FEATURE1 $FEATURE2"
+
+  COMP_WORDS=( git flow story start '' )
+  test_completion_matches "$FEATURE1 $FEATURE2"
+
+  git flow story start $FEATURE1 $STORY1
+
+  COMP_WORDS=( git flow story checkout '' )
+  test_completion_matches "$STORY1"
+
+  COMP_WORDS=( git flow story publish '' )
+  test_completion_matches "$STORY1"
+
+  COMP_WORDS=( git flow story delete '' )
+  test_completion_matches "$STORY1"
+
+  COMP_WORDS=( git flow story finish '' )
+  test_completion_matches "$STORY1"
+
+
+  git flow story delete $STORY1
+  git flow feature delete $FEATURE1
+  git flow feature delete $FEATURE2
 
   echo "--------------------- DONE ---------------------------"
 }
@@ -71,7 +107,7 @@ test_release_completion()
   COMP_WORDS=( git flow release delete '' )
   test_completion_matches "$RELEASE1"
 
-  git flow release finish $RELEASE1
+  git flow release delete $RELEASE1
 
   echo "--------------------- DONE ---------------------------"
 }
@@ -104,7 +140,7 @@ test_hotfix_completion()
   COMP_WORDS=( git flow hotfix delete '' )
   test_completion_matches "$HOTFIX1"
 
-  git flow hotfix finish $HOTFIX1
+  git flow hotfix delete $HOTFIX1
 
   echo "--------------------- DONE ---------------------------"
 }
@@ -130,6 +166,7 @@ set -e
 pushd $TEST_DIR
 
 test_feature_completion
+test_story_completion
 test_release_completion
 test_hotfix_completion
 

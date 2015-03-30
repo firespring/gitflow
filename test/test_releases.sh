@@ -108,6 +108,48 @@ test_release_multiple()
   echo "--------------------- DONE ---------------------------"
 }
 
+test_release_modification()
+{
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING RELEASE START -----------------"
+  echo "------------------------------------------------------"
+  git flow release start $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "---------- EXECUTING RELEASE CHECKOUT ----------------"
+  echo "------------------------------------------------------"
+  git flow release checkout $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING FEATURE START -----------------"
+  echo "------------------------------------------------------"
+  git flow feature start $FEATURE1 $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING FEATURE FINISH ----------------"
+  echo "------------------------------------------------------"
+  git flow feature finish $FEATURE1 $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING RELEASE FINISH ----------------"
+  echo "------------------------------------------------------"
+  git flow release finish $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+}
+
 set -e
 . ./init.sh
 
@@ -115,6 +157,7 @@ pushd $TEST_DIR
 
 test_release_base_functionality
 test_release_multiple
+test_release_modification
 
 popd
 
