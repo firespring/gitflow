@@ -1,44 +1,12 @@
 #!/bin/bash
 
-test_feature_base_functionality()
+test_release_base_functionality()
 {
-  echo -e "\n\n"
-  echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE LIST  -----------------"
-  echo "------------------------------------------------------"
-  git flow feature
-  echo "--------------------- DONE ---------------------------"
-
-
-  echo -e "\n\n"
-  echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE START -----------------"
-  echo "------------------------------------------------------"
-  git flow feature start TP-1234
-  echo "--------------------- DONE ---------------------------"
-
-
-  echo -e "\n\n"
-  echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE LIST  -----------------"
-  echo "------------------------------------------------------"
-  git flow feature list
-  echo "--------------------- DONE ---------------------------"
-
-
   echo -e "\n\n"
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE START -----------------"
   echo "------------------------------------------------------"
-  git flow release start r751-1
-  echo "--------------------- DONE ---------------------------"
-
-
-  echo -e "\n\n"
-  echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE FINISH ----------------"
-  echo "------------------------------------------------------"
-  git flow feature finish TP-1234 r751-1
+  git flow release start $RELEASE1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -46,25 +14,17 @@ test_feature_base_functionality()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE FINISH ----------------"
   echo "------------------------------------------------------"
-  git flow release finish r751-1
-  echo "--------------------- DONE ---------------------------"
-
-
-  echo -e "\n\n"
-  echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE LIST  -----------------"
-  echo "------------------------------------------------------"
-  git flow feature list
+  git flow release finish $RELEASE1
   echo "--------------------- DONE ---------------------------"
 }
 
-test_feature_finish_keep()
+test_release_multiple()
 {
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE START -----------------"
+  echo "------------ EXECUTING RELEASE LIST  -----------------"
   echo "------------------------------------------------------"
-  git flow feature start TP-1234
+  git flow release
   echo "--------------------- DONE ---------------------------"
 
 
@@ -72,31 +32,47 @@ test_feature_finish_keep()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE START -----------------"
   echo "------------------------------------------------------"
-  git flow release start r751-1
+  git flow release start $RELEASE1
   echo "--------------------- DONE ---------------------------"
 
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE FINISH ----------------"
+  echo "------------ EXECUTING RELEASE LIST  -----------------"
   echo "------------------------------------------------------"
-  git flow feature finish --keep TP-1234 r751-1
+  git flow release list
   echo "--------------------- DONE ---------------------------"
 
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE FINISH ----------------"
+  echo "------------ EXECUTING RELEASE START -----------------"
   echo "------------------------------------------------------"
-  git flow feature finish --keep TP-1234 r751-1
+  git flow release start $RELEASE2
   echo "--------------------- DONE ---------------------------"
 
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE DELETE ----------------"
+  echo "----- EXECUTING RELEASE START (no publish) -----------"
   echo "------------------------------------------------------"
-  git flow feature delete TP-1234
+  git flow release start --nopublish $RELEASE3
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING RELEASE LIST  -----------------"
+  echo "------------------------------------------------------"
+  git flow release list
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "----------- EXECUTING RELEASE PUBLISH ----------------"
+  echo "------------------------------------------------------"
+  git flow release publish $RELEASE3
   echo "--------------------- DONE ---------------------------"
 
 
@@ -104,7 +80,31 @@ test_feature_finish_keep()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE FINISH ----------------"
   echo "------------------------------------------------------"
-  git flow release finish r751-1
+  git flow release finish $RELEASE2
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING RELEASE FINISH ----------------"
+  echo "------------------------------------------------------"
+  git flow release finish $RELEASE3
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING RELEASE FINISH ----------------"
+  echo "------------------------------------------------------"
+  git flow release finish $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING RELEASE LIST  -----------------"
+  echo "------------------------------------------------------"
+  git flow release list
   echo "--------------------- DONE ---------------------------"
 }
 
@@ -113,8 +113,8 @@ set -e
 
 pushd $TEST_DIR
 
-test_feature_base_functionality
-test_feature_finish_keep
+test_release_base_functionality
+test_release_multiple
 
 popd
 

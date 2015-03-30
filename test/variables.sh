@@ -1,3 +1,11 @@
 #!/bin/bash
-export FEATURE1="TP-1234"
+export FEATURE1="TP-1111"
+export FEATURE2="TP-2222"
+export FEATURE3="TP-3333"
+export STORY1="TP-1234"
+export STORY2="TP-2345"
+export STORY3="TP-5678"
 export RELEASE1="r751-1"
+export RELEASE2="r752-1"
+export RELEASE3="r753-1"
+export HOTFIX1="r751-2"

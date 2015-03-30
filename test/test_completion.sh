@@ -22,12 +22,89 @@ test_feature_completion()
   COMP_WORDS=( git flow feature finish '' )
   test_completion_matches "$FEATURE1"
 
+  COMP_WORDS=( git flow feature checkout '' )
+  test_completion_matches "$FEATURE1"
+
+  COMP_WORDS=( git flow feature publish '' )
+  test_completion_matches "$FEATURE1"
+
+  COMP_WORDS=( git flow feature delete '' )
+  test_completion_matches "$FEATURE1"
+
   # Create a release so we can find it with auto-completion
   git flow release start $RELEASE1
 
   COMP_WORDS=( git flow feature finish $FEATURE1 '' )
-
   test_completion_matches "$RELEASE1"
+
+  git flow feature finish $FEATURE1 $RELEASE1
+  git flow release finish $RELEASE1
+
+  echo "--------------------- DONE ---------------------------"
+}
+
+test_release_completion()
+{
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "---------- TESTING RELEASE COMPLETION ----------------"
+  echo "------------------------------------------------------"
+
+  COMP_WORDS=( git flow release )
+  test_completion_matches "list start checkout finish track publish help delete"
+
+  COMP_WORDS=( git flow release finish )
+  test_completion_matches ""
+
+  # Create a release so we can find it with auto-completion
+  git flow release start $RELEASE1
+
+  COMP_WORDS=( git flow release finish '' )
+  test_completion_matches "$RELEASE1"
+
+  COMP_WORDS=( git flow release checkout '' )
+  test_completion_matches "$RELEASE1"
+
+  COMP_WORDS=( git flow release publish '' )
+  test_completion_matches "$RELEASE1"
+
+  COMP_WORDS=( git flow release delete '' )
+  test_completion_matches "$RELEASE1"
+
+  git flow release finish $RELEASE1
+
+  echo "--------------------- DONE ---------------------------"
+}
+
+test_hotfix_completion()
+{
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "---------- TESTING HOTFIX COMPLETION ----------------"
+  echo "------------------------------------------------------"
+
+  COMP_WORDS=( git flow hotfix )
+  test_completion_matches "list start checkout finish track publish help delete"
+
+  COMP_WORDS=( git flow hotfix finish )
+  test_completion_matches ""
+
+  # Create a hotfix so we can find it with auto-completion
+  git flow hotfix start $HOTFIX1
+
+  COMP_WORDS=( git flow hotfix finish '' )
+  test_completion_matches "$HOTFIX1"
+
+  COMP_WORDS=( git flow hotfix checkout '' )
+  test_completion_matches "$HOTFIX1"
+
+  COMP_WORDS=( git flow hotfix publish '' )
+  test_completion_matches "$HOTFIX1"
+
+  COMP_WORDS=( git flow hotfix delete '' )
+  test_completion_matches "$HOTFIX1"
+
+  git flow hotfix finish $HOTFIX1
 
   echo "--------------------- DONE ---------------------------"
 }
@@ -53,6 +130,8 @@ set -e
 pushd $TEST_DIR
 
 test_feature_completion
+test_release_completion
+test_hotfix_completion
 
 popd
 
