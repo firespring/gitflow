@@ -14,7 +14,7 @@ test_feature_base_functionality()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING FEATURE START -----------------"
   echo "------------------------------------------------------"
-  git flow feature start $FEATURE1
+  git flow feature start TP-1234
   echo "--------------------- DONE ---------------------------"
 
 
@@ -30,7 +30,7 @@ test_feature_base_functionality()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE START -----------------"
   echo "------------------------------------------------------"
-  git flow release start $RELEASE1
+  git flow release start r751-1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -38,7 +38,7 @@ test_feature_base_functionality()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING FEATURE FINISH ----------------"
   echo "------------------------------------------------------"
-  git flow feature finish $FEATURE1 $RELEASE1
+  git flow feature finish TP-1234 r751-1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -46,7 +46,7 @@ test_feature_base_functionality()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE FINISH ----------------"
   echo "------------------------------------------------------"
-  git flow release finish $RELEASE1
+  git flow release finish r751-1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -64,7 +64,7 @@ test_feature_finish_keep()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING FEATURE START -----------------"
   echo "------------------------------------------------------"
-  git flow feature start $FEATURE1
+  git flow feature start TP-1234
   echo "--------------------- DONE ---------------------------"
 
 
@@ -72,7 +72,7 @@ test_feature_finish_keep()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE START -----------------"
   echo "------------------------------------------------------"
-  git flow release start $RELEASE1
+  git flow release start r751-1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -80,7 +80,7 @@ test_feature_finish_keep()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING FEATURE FINISH ----------------"
   echo "------------------------------------------------------"
-  git flow feature finish --keep $FEATURE1 $RELEASE1
+  git flow feature finish --keep TP-1234 r751-1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -88,7 +88,7 @@ test_feature_finish_keep()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING FEATURE FINISH ----------------"
   echo "------------------------------------------------------"
-  git flow feature finish --keep $FEATURE1 $RELEASE1
+  git flow feature finish --keep TP-1234 r751-1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -96,7 +96,7 @@ test_feature_finish_keep()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING FEATURE DELETE ----------------"
   echo "------------------------------------------------------"
-  git flow feature delete $FEATURE1
+  git flow feature delete TP-1234
   echo "--------------------- DONE ---------------------------"
 
 
@@ -104,7 +104,7 @@ test_feature_finish_keep()
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE FINISH ----------------"
   echo "------------------------------------------------------"
-  git flow release finish $RELEASE1
+  git flow release finish r751-1
   echo "--------------------- DONE ---------------------------"
 }
 
