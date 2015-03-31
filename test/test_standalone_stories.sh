@@ -1,12 +1,28 @@
 #!/bin/bash
 
-test_release_base_functionality()
+test_standalone_story_base_functionality()
 {
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "-------- EXECUTING STANDALONE STORY START ------------"
+  echo "------------------------------------------------------"
+  git flow standalone-story start $STORY1
+  echo "--------------------- DONE ---------------------------"
+
+
   echo -e "\n\n"
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE START -----------------"
   echo "------------------------------------------------------"
   git flow release start $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "-------- EXECUTING STANDALONE STORY FINISH -----------"
+  echo "------------------------------------------------------"
+  git flow standalone-story finish $STORY1 $RELEASE1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -18,13 +34,61 @@ test_release_base_functionality()
   echo "--------------------- DONE ---------------------------"
 }
 
-test_release_multiple()
+test_standalone_story_multiple()
 {
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING RELEASE LIST  -----------------"
+  echo "-------- EXECUTING STANDALONE STORY LIST  ------------"
   echo "------------------------------------------------------"
-  git flow release
+  git flow standalone-story
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "-------- EXECUTING STANDALONE STORY START ------------"
+  echo "------------------------------------------------------"
+  git flow standalone-story start $STORY1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "-------- EXECUTING STANDALONE STORY LIST  ------------"
+  echo "------------------------------------------------------"
+  git flow standalone-story list
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "-------- EXECUTING STANDALONE STORY START ------------"
+  echo "------------------------------------------------------"
+  git flow standalone-story start $STORY2
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "-------- EXECUTING STANDALONE STORY START ------------"
+  echo "------------------------------------------------------"
+  git flow standalone-story start --nopublish $STORY3
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "-------- EXECUTING STANDALONE STORY LIST  ------------"
+  echo "------------------------------------------------------"
+  git flow standalone-story list
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------- EXECUTING STANDALONE STORY PUBLISH -----------"
+  echo "------------------------------------------------------"
+  git flow standalone-story publish $STORY3
   echo "--------------------- DONE ---------------------------"
 
 
@@ -38,57 +102,25 @@ test_release_multiple()
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING RELEASE LIST  -----------------"
+  echo "-------- EXECUTING STANDALONE STORY FINISH -----------"
   echo "------------------------------------------------------"
-  git flow release list
+  git flow standalone-story finish $STORY2 $RELEASE1
   echo "--------------------- DONE ---------------------------"
 
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING RELEASE START -----------------"
+  echo "-------- EXECUTING STANDALONE STORY FINISH -----------"
   echo "------------------------------------------------------"
-  git flow release start $RELEASE2
+  git flow standalone-story finish $STORY3 $RELEASE1
   echo "--------------------- DONE ---------------------------"
 
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "----- EXECUTING RELEASE START (no publish) -----------"
+  echo "-------- EXECUTING STANDALONE STORY FINISH -----------"
   echo "------------------------------------------------------"
-  git flow release start --nopublish $RELEASE3
-  echo "--------------------- DONE ---------------------------"
-
-
-  echo -e "\n\n"
-  echo "------------------------------------------------------"
-  echo "------------ EXECUTING RELEASE LIST  -----------------"
-  echo "------------------------------------------------------"
-  git flow release list
-  echo "--------------------- DONE ---------------------------"
-
-
-  echo -e "\n\n"
-  echo "------------------------------------------------------"
-  echo "----------- EXECUTING RELEASE PUBLISH ----------------"
-  echo "------------------------------------------------------"
-  git flow release publish $RELEASE3
-  echo "--------------------- DONE ---------------------------"
-
-
-  echo -e "\n\n"
-  echo "------------------------------------------------------"
-  echo "------------ EXECUTING RELEASE FINISH ----------------"
-  echo "------------------------------------------------------"
-  git flow release finish $RELEASE2
-  echo "--------------------- DONE ---------------------------"
-
-
-  echo -e "\n\n"
-  echo "------------------------------------------------------"
-  echo "------------ EXECUTING RELEASE FINISH ----------------"
-  echo "------------------------------------------------------"
-  git flow release finish $RELEASE3
+  git flow standalone-story finish $STORY1 $RELEASE1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -102,14 +134,30 @@ test_release_multiple()
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING RELEASE LIST  -----------------"
+  echo "-------- EXECUTING STANDALONE STORY LIST  ------------"
   echo "------------------------------------------------------"
-  git flow release list
+  git flow standalone-story list
   echo "--------------------- DONE ---------------------------"
 }
 
-test_release_modification()
+test_standalone_story_finish_keep()
 {
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "-------- EXECUTING STANDALONE STORY START ------------"
+  echo "------------------------------------------------------"
+  git flow standalone-story start $STORY1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------- EXECUTING STANDALONE STORY CHECKOUT ----------"
+  echo "------------------------------------------------------"
+  git flow standalone-story checkout $STORY1
+  echo "--------------------- DONE ---------------------------"
+
+
   echo -e "\n\n"
   echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE START -----------------"
@@ -120,25 +168,25 @@ test_release_modification()
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "---------- EXECUTING RELEASE CHECKOUT ----------------"
+  echo "-------- EXECUTING STANDALONE STORY FINISH -----------"
   echo "------------------------------------------------------"
-  git flow release checkout $RELEASE1
+  git flow standalone-story finish --keep $STORY1 $RELEASE1
   echo "--------------------- DONE ---------------------------"
 
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE START -----------------"
+  echo "-------- EXECUTING STANDALONE STORY FINISH -----------"
   echo "------------------------------------------------------"
-  git flow feature start $FEATURE1
+  git flow standalone-story finish --keep $STORY1 $RELEASE1
   echo "--------------------- DONE ---------------------------"
 
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING FEATURE FINISH ----------------"
+  echo "-------- EXECUTING STANDALONE STORY DELETE -----------"
   echo "------------------------------------------------------"
-  git flow feature finish $FEATURE1 $RELEASE1
+  git flow standalone-story delete $STORY1
   echo "--------------------- DONE ---------------------------"
 
 
@@ -155,9 +203,9 @@ set -e
 
 pushd $TEST_DIR
 
-test_release_base_functionality
-test_release_multiple
-test_release_modification
+test_standalone_story_base_functionality
+test_standalone_story_multiple
+test_standalone_story_finish_keep
 
 popd
 

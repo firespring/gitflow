@@ -79,6 +79,43 @@ test_story_completion()
   echo "--------------------- DONE ---------------------------"
 }
 
+test_standalone_story_completion()
+{
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "---------- TESTING STANDALONE STORY COMPLETION ----------------"
+  echo "------------------------------------------------------"
+
+  COMP_WORDS=( git flow standalone-story )
+  test_completion_matches "list start finish publish track diff rebase checkout pull help delete"
+
+  # Create a standalone-story so we can find it with auto-completion
+  git flow standalone-story start $STORY1
+
+  COMP_WORDS=( git flow standalone-story checkout '' )
+  test_completion_matches "$STORY1"
+
+  COMP_WORDS=( git flow standalone-story publish '' )
+  test_completion_matches "$STORY1"
+
+  COMP_WORDS=( git flow standalone-story delete '' )
+  test_completion_matches "$STORY1"
+
+  COMP_WORDS=( git flow standalone-story finish '' )
+  test_completion_matches "$STORY1"
+
+  # Create a release so we can find it with auto-completion
+  git flow release start $RELEASE1
+
+  COMP_WORDS=( git flow standalone-story finish $STORY1 '' )
+  test_completion_matches "$RELEASE1"
+
+  git flow standalone-story delete $STORY1 $RELEASE1
+  git flow release delete $RELEASE1
+
+  echo "--------------------- DONE ---------------------------"
+}
+
 test_release_completion()
 {
   echo -e "\n\n"
@@ -167,6 +204,7 @@ pushd $TEST_DIR
 
 test_feature_completion
 test_story_completion
+test_standalone_story_completion
 test_release_completion
 test_hotfix_completion
 

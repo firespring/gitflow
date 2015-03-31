@@ -246,6 +246,72 @@ test_story_finish_keep()
   echo "--------------------- DONE ---------------------------"
 }
 
+test_story_unfinished_stories()
+{
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING FEATURE START -----------------"
+  echo "------------------------------------------------------"
+  git flow feature start $FEATURE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------- EXECUTING STORY START ------------------"
+  echo "------------------------------------------------------"
+  git flow story start $FEATURE1 $STORY1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING STORY CHECKOUT ----------------"
+  echo "------------------------------------------------------"
+  git flow story checkout $STORY1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING RELEASE START -----------------"
+  echo "------------------------------------------------------"
+  git flow release start $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING FEATURE FINISH ----------------"
+  echo "------------------------------------------------------"
+  git flow feature finish $FEATURE1 $RELEASE1 || true
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING STORY FINISH ----------------"
+  echo "------------------------------------------------------"
+  git flow story finish $STORY1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING FEATURE FINISH ----------------"
+  echo "------------------------------------------------------"
+  git flow feature finish $FEATURE1 $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------ EXECUTING RELEASE FINISH ----------------"
+  echo "------------------------------------------------------"
+  git flow release finish $RELEASE1
+  echo "--------------------- DONE ---------------------------"
+}
+
 set -e
 . ./init.sh
 
@@ -254,6 +320,7 @@ pushd $TEST_DIR
 test_story_base_functionality
 test_story_multiple
 test_story_finish_keep
+test_story_unfinished_stories
 
 popd
 

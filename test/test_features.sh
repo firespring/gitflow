@@ -152,6 +152,14 @@ test_feature_finish_keep()
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
+  echo "----------- EXECUTING FEATURE CHECKOUT ---------------"
+  echo "------------------------------------------------------"
+  git flow feature checkout $FEATURE1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
   echo "------------ EXECUTING RELEASE START -----------------"
   echo "------------------------------------------------------"
   git flow release start $RELEASE1

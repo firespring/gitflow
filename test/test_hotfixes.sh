@@ -4,7 +4,7 @@ test_hotfix_base_functionality()
 {
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING HOTFIX LIST  -----------------"
+  echo "------------- EXECUTING HOTFIX LIST  -----------------"
   echo "------------------------------------------------------"
   git flow hotfix
   echo "--------------------- DONE ---------------------------"
@@ -12,7 +12,7 @@ test_hotfix_base_functionality()
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "----- EXECUTING HOTFIX START (no publish) -----------"
+  echo "------ EXECUTING HOTFIX START (no publish) -----------"
   echo "------------------------------------------------------"
   git flow hotfix start --nopublish $HOTFIX1
   echo "--------------------- DONE ---------------------------"
@@ -20,7 +20,7 @@ test_hotfix_base_functionality()
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING HOTFIX LIST  -----------------"
+  echo "------------- EXECUTING HOTFIX LIST  -----------------"
   echo "------------------------------------------------------"
   git flow hotfix list
   echo "--------------------- DONE ---------------------------"
@@ -28,7 +28,7 @@ test_hotfix_base_functionality()
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "----------- EXECUTING HOTFIX PUBLISH ----------------"
+  echo "------------ EXECUTING HOTFIX PUBLISH ----------------"
   echo "------------------------------------------------------"
   git flow hotfix publish $HOTFIX1
   echo "--------------------- DONE ---------------------------"
@@ -36,7 +36,15 @@ test_hotfix_base_functionality()
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING HOTFIX FINISH ----------------"
+  echo "----------- EXECUTING HOTFIX CHECKOUT ----------------"
+  echo "------------------------------------------------------"
+  git flow hotfix checkout $HOTFIX1
+  echo "--------------------- DONE ---------------------------"
+
+
+  echo -e "\n\n"
+  echo "------------------------------------------------------"
+  echo "------------- EXECUTING HOTFIX FINISH ----------------"
   echo "------------------------------------------------------"
   git flow hotfix finish $HOTFIX1
   echo "--------------------- DONE ---------------------------"
@@ -44,7 +52,7 @@ test_hotfix_base_functionality()
 
   echo -e "\n\n"
   echo "------------------------------------------------------"
-  echo "------------ EXECUTING HOTFIX LIST  -----------------"
+  echo "------------- EXECUTING HOTFIX LIST  -----------------"
   echo "------------------------------------------------------"
   git flow hotfix list
   echo "--------------------- DONE ---------------------------"

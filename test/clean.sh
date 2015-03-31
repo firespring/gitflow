@@ -34,6 +34,19 @@ echo "Removing story branch ($STORY3)"
 git push origin :feature/$FEATURE2/story/$STORY3 > /dev/null 2>/dev/null
 git branch -D feature/$FEATURE2/story/$STORY3 > /dev/null 2>/dev/null
 
+# Remove standalone-story branches
+echo "Removing standalone-story branch ($STORY1)"
+git push origin :story/$STORY1 > /dev/null 2>/dev/null
+git branch -D /story/$STORY1 > /dev/null 2>/dev/null
+
+echo "Removing standalone-story branch ($STORY2)"
+git push origin :story/$STORY2 > /dev/null 2>/dev/null
+git branch -D story/$STORY2 > /dev/null 2>/dev/null
+
+echo "Removing standalone-story branch ($STORY3)"
+git push origin :story/$STORY3 > /dev/null 2>/dev/null
+git branch -D story/$STORY3 > /dev/null 2>/dev/null
+
 # Remove release branches
 echo "Removing release branch ($RELEASE1)"
 git push origin :release/$RELEASE1 > /dev/null 2>/dev/null
