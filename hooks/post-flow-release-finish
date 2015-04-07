@@ -1,11 +1,12 @@
 #!/bin/sh
 #
-# Runs at the end of git flow release finish
+# Runs at the end of git flow release start
 #
 # Positional arguments:
 # $1    The version (including the version prefix)
 # $2    The origin remote
 # $3    The full branch name (including the release prefix)
+# $4    The base from which this release is started
 #
 # The following variables are available as they are exported by git-flow:
 #
@@ -15,7 +16,27 @@
 VERSION=$1
 ORIGIN=$2
 BRANCH=$3
+BASE=$4
 
 # Implement your script here.
+if [ -f ~/.env ]; then
+  . ~/.env
+
+  if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
+    # Check if a release exists in TP for the one we are creating. If it does, do nothing.
+    ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$VERSION'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+
+
+    if [ "$ID" != "" ]
+    then
+      # No release branch exists - create one
+      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases/$ID --header "Content-Type: application/json" --data "
+        {
+          EndDate: '`date +"%Y-%m-%d"`'
+        }
+      " >> /tmp/git-flow.hooks.log 2>&1
+    fi
+  fi
+fi
 
 exit 0
