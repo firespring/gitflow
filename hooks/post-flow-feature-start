@@ -23,7 +23,7 @@ if [ -f ~/.env ]; then
 
   if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
     # Implement your script here.
-    FEATURE_NUMBER=`echo $NAME | grep -o -E '([0-9]+)'`
+    FEATURE_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
     curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data '{EntityState: {Id: 58}}' >> /tmp/git-flow.hooks.log 2>&1
   fi
 fi

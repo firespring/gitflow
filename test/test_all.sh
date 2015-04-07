@@ -2,6 +2,12 @@
 set -e
 cd `dirname $0`
 
+if [ -d ~/.env ] || [ "$TP_USERNAME" != "" ] || [ "$TP_PASSWORD" != "" ] || [ "$TP_URL" != "" ]
+then
+  echo "Targetprocess credentials found. Please remove before running tests"
+  exit 1
+fi
+
 echo "STARTED TESTING"
 
 test_directory="`pwd`/test"

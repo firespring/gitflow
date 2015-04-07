@@ -1,12 +1,12 @@
 #!/bin/sh
 #
-# Runs at the end of git flow story start
+# Runs at the end of git flow standalone-story start
 #
 # Positional arguments:
 # $1    The friendly name of the branch
 # $2    The origin remote
 # $3    The full branch name (including the feature prefix)
-# $4    The base from which this story is started
+# $4    The base from which this standalone-story is started
 #
 # The following variables are available as they are exported by git-flow:
 #
