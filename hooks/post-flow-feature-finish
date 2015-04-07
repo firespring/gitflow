@@ -6,6 +6,7 @@
 # $1    The friendly name of the branch
 # $2    The origin remote
 # $3    The full branch name (including the feature prefix)
+# $4    The name of the release this feature will be merged into
 #
 # The following variables are available as they are exported by git-flow:
 #
@@ -15,14 +16,34 @@
 NAME=$1
 ORIGIN=$2
 BRANCH=$3
+RELEASE=$4
 
 if [ -f ~/.env ]; then
   . ~/.env
 
   if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
-    # Implement your script here.
+    # Mark the feature as qa pending
     FEATURE_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
-    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data '{EntityState: {Id: 98}}' >> /tmp/git-flow.hooks.log 2>&1
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data "
+      {
+        EntityState: {
+          Id: 98
+        }
+      }
+    " >> /tmp/git-flow.hooks.log 2>&1
+
+    # Add the feature to the release it was merged into
+    RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$RELEASE'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+
+    if [ "$RELEASE_ID" != "" ]
+    then
+      # Update the feature's release
+      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --header "Content-Type: application/json" --data "
+        {
+          Release: {Id: $RELEASE_ID}
+        }
+      " >> /tmp/git-flow.hooks.log 2>&1
+    fi
   fi
 fi
 

@@ -242,13 +242,13 @@ F,[no]fetch      Fetch from $ORIGIN before performing local operation
 		require_branches_equal "$base" "$ORIGIN/$base"
 	fi
 
-	run_pre_hook "$NAME" "$ORIGIN" "$BRANCH" "$base"
+	run_pre_hook "$NAME" "$ORIGIN" "$BRANCH" "$base" "$FEATURE_NAME"
 
 
 	# create branch
 	git_do checkout -b "$BRANCH" "$base" || die "Could not create story branch '$BRANCH'."
 
-	run_post_hook "$NAME" "$ORIGIN" "$BRANCH" "$base"
+	run_post_hook "$NAME" "$ORIGIN" "$BRANCH" "$base" "$FEATURE_NAME"
 
 	echo
 	echo "Summary of actions:"
@@ -262,7 +262,10 @@ F,[no]fetch      Fetch from $ORIGIN before performing local operation
 
   # Keeping both branches implies the --keep flag to be true.
   if flag publish; then
+    orig_action=$SUBACTION
+    SUBACTION='publish'
     cmd_publish $NAME
+    SUBACTION=$orig_action
   fi
 }
 

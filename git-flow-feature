@@ -264,7 +264,10 @@ F,[no]fetch      Fetch from $ORIGIN before performing local operation
 
   # Keeping both branches implies the --keep flag to be true.
   if flag publish; then
+    orig_action=$SUBACTION
+    SUBACTION='publish'
     cmd_publish $NAME
+    SUBACTION=$orig_action
   fi
 }
 
@@ -415,7 +418,7 @@ no-ff!                 Never fast-forward during the merge
 		require_branches_equal "$BASE_BRANCH" "$ORIGIN/$BASE_BRANCH"
 	fi
 
-	run_pre_hook "$NAME" "$ORIGIN" "$BRANCH"
+	run_pre_hook "$NAME" "$ORIGIN" "$BRANCH" "$RELEASE"
 
 	# If the user wants to rebase, do that first
 	if flag rebase; then
@@ -475,7 +478,7 @@ no-ff!                 Never fast-forward during the merge
     git_do push "$ORIGIN" "$BASE_BRANCH" || die "Could not push branch '$BASE_BRANCH' to remote '$ORIGIN'."
   fi
 
-	run_post_hook "$NAME" "$ORIGIN" "$BRANCH"
+	run_post_hook "$NAME" "$ORIGIN" "$BRANCH" "$RELEASE"
 
 	# When no merge conflict is detected, just clean up the feature branch
 	gitflow_config_remove_base_branch "$BRANCH"

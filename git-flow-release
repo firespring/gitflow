@@ -547,7 +547,10 @@ v,verbose!           Verbose (more) output
 
   # Keeping both branches implies the --keep flag to be true.
   if flag publish; then
+    orig_action=$SUBACTION
+    SUBACTION='publish'
     cmd_publish $NAME
+    SUBACTION=$orig_action
   fi
 }
 

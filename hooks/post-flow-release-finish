@@ -24,13 +24,13 @@ if [ -f ~/.env ]; then
 
   if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
     # Check if a release exists in TP for the one we are creating. If it does, do nothing.
-    ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$VERSION'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+    RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$VERSION'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
 
 
-    if [ "$ID" != "" ]
+    if [ "$RELEASE_ID" != "" ]
     then
-      # No release branch exists - create one
-      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases/$ID --header "Content-Type: application/json" --data "
+      # Set the end date to today
+      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases/$RELEASE_ID --header "Content-Type: application/json" --data "
         {
           EndDate: '`date +"%Y-%m-%d"`'
         }

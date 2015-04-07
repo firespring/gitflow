@@ -6,6 +6,7 @@
 # $1    The friendly name of the branch
 # $2    The origin remote
 # $3    The full branch name (including the feature prefix)
+# $4    The name of the release this feature will be merged into
 #
 # The following variables are available as they are exported by git-flow:
 #
@@ -15,6 +16,7 @@
 NAME=$1
 ORIGIN=$2
 BRANCH=$3
+RELEASE=$4
 
 # Implement your script here.
 

@@ -7,6 +7,7 @@
 # $2    The origin remote
 # $3    The full branch name (including the feature prefix)
 # $4    The base from which this story is started
+# $5    The feature the story is associated with
 #
 # The following variables are available as they are exported by git-flow:
 #
@@ -17,14 +18,56 @@ NAME=$1
 ORIGIN=$2
 BRANCH=$3
 BASE=$4
+FEATURE=$5
 
 if [ -f ~/.env ]; then
   . ~/.env
 
   if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
-    # Ignore everything except numbers
+    # Make story in-progress
     STORY_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
-    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --request POST --header "Content-Type: application/json" --data '{EntityState: {Id: 47}}' >> /tmp/git-flow.hooks.log 2>&1
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --header "Content-Type: application/json" --data "
+      {
+        EntityState: {
+          Id: 47
+        }
+      }
+    " >> /tmp/git-flow.hooks.log 2>&1
+
+    # Find the TP User Id of my user
+    USER_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Users -d "where=Login eq '$TP_USERNAME'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+
+    if [ "$USER_ID" != "" ]
+    then
+      # Assign current user to story as a developer
+      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER/Assignments --header "Content-Type: application/json" --data "
+        [
+          {
+            GeneralUser: {
+              Id: $USER_ID
+            },
+            Role: {
+              Id: 1
+            }
+          }
+        ]
+      " >> /tmp/git-flow.hooks.log 2>&1
+
+      # Assign current user to feature as a developer
+      FEATURE_NUMBER=`echo $FEATURE | egrep -o '[0-9]+'`
+      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER/Assignments --header "Content-Type: application/json" --data "
+        [
+          {
+            GeneralUser: {
+              Id: $USER_ID
+            },
+            Role: {
+              Id: 1
+            }
+          }
+        ]
+      " >> /tmp/git-flow.hooks.log 2>&1
+    fi
   fi
 fi
 

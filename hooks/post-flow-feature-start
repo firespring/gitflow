@@ -24,7 +24,33 @@ if [ -f ~/.env ]; then
   if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
     # Implement your script here.
     FEATURE_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
-    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data '{EntityState: {Id: 58}}' >> /tmp/git-flow.hooks.log 2>&1
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data "
+      {
+        EntityState: {
+          Id: 58
+        }
+      }
+    " >> /tmp/git-flow.hooks.log 2>&1
+
+    # Find the TP User Id of my user
+    USER_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Users -d "where=Login eq '$TP_USERNAME'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+
+    # Assign current user to feature as a developer
+    if [ "$USER_ID" != "" ]
+    then
+      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER/Assignments --header "Content-Type: application/json" --data "
+        [
+          {
+            GeneralUser: {
+              Id: $USER_ID
+            },
+            Role: {
+              Id: 1
+            }
+          }
+        ]
+      " >> /tmp/git-flow.hooks.log 2>&1
+    fi
   fi
 fi
 
