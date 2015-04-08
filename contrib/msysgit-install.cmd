@@ -38,8 +38,10 @@ if errorlevel 4 if not errorlevel 5 goto :AccessDenied
 if errorlevel 1 set ERR=1
 xcopy "%~dp0\..\git-flow*"           "%GIT_HOME%\bin"                 /Y /R /F || set ERR=1
 xcopy "%~dp0\..\gitflow-*"           "%GIT_HOME%\bin"                 /Y /R /F || set ERR=1
-if not exist "%GIT_HOME%\hooks" md   "%GIT_HOME%\hooks"               /Y /R /F || set ERR=1
-xcopy "%~dp0\..\hooks\*"             "%GIT_HOME%\hooks"               /Y /R /F || set ERR=1
+
+set HOOK_DIR="%GIT_HOME%\local\share\doc\gitflow\hooks"
+if not exist "%HOOK_DIR%" md "%HOOK_DIR%"                             /Y /R /F || set ERR=1
+xcopy "%~dp0\..\hooks\*"             "%HOOK_DIR%"                     /Y /R /F || set ERR=1
 
 if %ERR%==1 choice /T 30 /C Y /D Y /M "Some unexpected errors happened. Sorry, you'll have to fix them by yourself."
 
