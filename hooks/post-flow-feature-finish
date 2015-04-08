@@ -20,31 +20,33 @@ RELEASE=$4
 
 if [ -f ~/.env ]; then
   . ~/.env
+fi
 
-  if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
-    # Mark the feature as qa pending
-    FEATURE_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
-    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data "
+if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
+  # Mark the feature as qa pending
+  FEATURE_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
+  curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data "
+    {
+      EntityState: {
+        Id: 98
+      }
+    }
+  " >> /tmp/git-flow.hooks.log 2>&1
+
+  # Add the feature to the release it was merged into
+  RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$RELEASE'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+
+  if [ "$RELEASE_ID" != "" ]
+  then
+    # Update the feature's release
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --header "Content-Type: application/json" --data "
       {
-        EntityState: {
-          Id: 98
-        }
+        Release: {Id: $RELEASE_ID}
       }
     " >> /tmp/git-flow.hooks.log 2>&1
-
-    # Add the feature to the release it was merged into
-    RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$RELEASE'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
-
-    if [ "$RELEASE_ID" != "" ]
-    then
-      # Update the feature's release
-      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --header "Content-Type: application/json" --data "
-        {
-          Release: {Id: $RELEASE_ID}
-        }
-      " >> /tmp/git-flow.hooks.log 2>&1
-    fi
   fi
+else
+  echo "WARNING: Targetprocess user information is not configured. Skipping targetprocess updates."
 fi
 
 exit 0

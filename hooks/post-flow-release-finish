@@ -18,25 +18,25 @@ ORIGIN=$2
 BRANCH=$3
 BASE=$4
 
-# Implement your script here.
 if [ -f ~/.env ]; then
   . ~/.env
+fi
 
-  if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
-    # Check if a release exists in TP for the one we are creating. If it does, do nothing.
-    RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$VERSION'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
+  # Find the id of the release we are finishing
+  RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$VERSION'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
 
-
-    if [ "$RELEASE_ID" != "" ]
-    then
-      # Set the end date to today
-      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases/$RELEASE_ID --header "Content-Type: application/json" --data "
-        {
-          EndDate: '`date +"%Y-%m-%d"`'
-        }
-      " >> /tmp/git-flow.hooks.log 2>&1
-    fi
+  if [ "$RELEASE_ID" != "" ]
+  then
+    # Set the end date to today
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases/$RELEASE_ID --header "Content-Type: application/json" --data "
+      {
+        EndDate: '`date +"%Y-%m-%d"`'
+      }
+    " >> /tmp/git-flow.hooks.log 2>&1
   fi
+else
+  echo "WARNING: Targetprocess user information is not configured. Skipping targetprocess updates."
 fi
 
 exit 0

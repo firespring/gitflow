@@ -20,18 +20,20 @@ BASE=$4
 
 if [ -f ~/.env ]; then
   . ~/.env
+fi
 
-  if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
-    # Ignore everything except numbers
-    STORY_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
-    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --request POST --header "Content-Type: application/json" --data "
-      {
-        EntityState: {
-          Id: 73
-        }
+if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
+  # Mark the story as done
+  STORY_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
+  curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --request POST --header "Content-Type: application/json" --data "
+    {
+      EntityState: {
+        Id: 73
       }
-    " >> /tmp/git-flow.hooks.log 2>&1
-  fi
+    }
+  " >> /tmp/git-flow.hooks.log 2>&1
+else
+  echo "WARNING: Targetprocess user information is not configured. Skipping targetprocess updates."
 fi
 
 exit 0

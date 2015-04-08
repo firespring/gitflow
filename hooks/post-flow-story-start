@@ -22,53 +22,55 @@ FEATURE=$5
 
 if [ -f ~/.env ]; then
   . ~/.env
+fi
 
-  if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
-    # Make story in-progress
-    STORY_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
-    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --header "Content-Type: application/json" --data "
-      {
-        EntityState: {
-          Id: 47
-        }
+if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
+  # Make story in-progress
+  STORY_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
+  curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --header "Content-Type: application/json" --data "
+    {
+      EntityState: {
+        Id: 47
       }
+    }
+  " >> /tmp/git-flow.hooks.log 2>&1
+
+  # Find the TP User Id of my user
+  USER_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Users -d "where=Login eq '$TP_USERNAME'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+
+  if [ "$USER_ID" != "" ]
+  then
+    # Assign current user to story as a developer
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER/Assignments --header "Content-Type: application/json" --data "
+      [
+        {
+          GeneralUser: {
+            Id: $USER_ID
+          },
+          Role: {
+            Id: 1
+          }
+        }
+      ]
     " >> /tmp/git-flow.hooks.log 2>&1
 
-    # Find the TP User Id of my user
-    USER_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Users -d "where=Login eq '$TP_USERNAME'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
-
-    if [ "$USER_ID" != "" ]
-    then
-      # Assign current user to story as a developer
-      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER/Assignments --header "Content-Type: application/json" --data "
-        [
-          {
-            GeneralUser: {
-              Id: $USER_ID
-            },
-            Role: {
-              Id: 1
-            }
+    # Assign current user to feature as a developer
+    FEATURE_NUMBER=`echo $FEATURE | egrep -o '[0-9]+'`
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER/Assignments --header "Content-Type: application/json" --data "
+      [
+        {
+          GeneralUser: {
+            Id: $USER_ID
+          },
+          Role: {
+            Id: 1
           }
-        ]
-      " >> /tmp/git-flow.hooks.log 2>&1
-
-      # Assign current user to feature as a developer
-      FEATURE_NUMBER=`echo $FEATURE | egrep -o '[0-9]+'`
-      curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER/Assignments --header "Content-Type: application/json" --data "
-        [
-          {
-            GeneralUser: {
-              Id: $USER_ID
-            },
-            Role: {
-              Id: 1
-            }
-          }
-        ]
-      " >> /tmp/git-flow.hooks.log 2>&1
-    fi
+        }
+      ]
+    " >> /tmp/git-flow.hooks.log 2>&1
   fi
+else
+  echo "WARNING: Targetprocess user information is not configured. Skipping targetprocess updates."
 fi
 
 exit 0
