@@ -24,7 +24,7 @@ fi
 
 if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
   # Find the id of the release we are finishing
-  RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$VERSION'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+  RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$VERSION'" --request GET --header "Accept: application/json" | egrep '"Id"' | head -1 | sed -r "s@[^0-9]*([0-9]+).*@\1@g"`"
 
   if [ "$RELEASE_ID" != "" ]
   then

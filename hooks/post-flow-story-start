@@ -26,7 +26,7 @@ fi
 
 if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
   # Make story in-progress
-  STORY_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
+  STORY_NUMBER=`echo $NAME | sed -r "s@[^0-9]*([0-9]+).*@\1@g"`
   curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --header "Content-Type: application/json" --data "
     {
       EntityState: {
@@ -36,7 +36,7 @@ if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; 
   " >> /tmp/git-flow.hooks.log 2>&1
 
   # Find the TP User Id of my user
-  USER_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Users -d "where=Login eq '$TP_USERNAME'" --request GET --header "Accept: application/json" | egrep -m 1 '"Id"' | egrep -o "[0-9]+"`"
+  USER_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Users -d "where=Login eq '$TP_USERNAME'" --request GET --header "Accept: application/json" | egrep '"Id"' | head -1 | sed -r "s@[^0-9]*([0-9]+).*@\1@g"`"
 
   if [ "$USER_ID" != "" ]
   then
@@ -55,7 +55,7 @@ if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; 
     " >> /tmp/git-flow.hooks.log 2>&1
 
     # Assign current user to feature as a developer
-    FEATURE_NUMBER=`echo $FEATURE | egrep -o '[0-9]+'`
+    FEATURE_NUMBER=`echo $FEATURE | sed -r "s@[^0-9]*([0-9]+).*@\1@g"`
     curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER/Assignments --header "Content-Type: application/json" --data "
       [
         {

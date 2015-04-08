@@ -24,7 +24,7 @@ fi
 
 if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
   # Mark the story as in progress
-  STORY_NUMBER=`echo $NAME | egrep -o '[0-9]+'`
+  STORY_NUMBER=`echo $NAME | sed -r "s@[^0-9]*([0-9]+).*@\1@g"`
   curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --request POST --header "Content-Type: application/json" --data "
     {
       EntityState: {
