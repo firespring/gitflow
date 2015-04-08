@@ -709,8 +709,8 @@ run_filter_hook() {
 	command=$1
 	shift
 	scriptfile="${HOOKS_DIR}/filter-flow-${command}"
-	if [ -x $scriptfile ]; then
-		return=`$scriptfile "$@"`
+	if [ -x "$scriptfile" ]; then
+		return=`"$scriptfile" "$@"`
 		if [ $? -eq 127 ]; then
 			echo "$return"
 			exit 127
@@ -737,8 +737,8 @@ run_pre_hook() {
 
 	scriptfile="${HOOKS_DIR}/pre-flow-${SUBCOMMAND}-${SUBACTION}"
 	exitcode=0
-	if [ -x $scriptfile ]; then
-		$scriptfile "$@"
+	if [ -x "$scriptfile" ]; then
+		"$scriptfile" "$@"
 		exitcode=$?
 
 		if [ $exitcode -gt 0 ]; then
@@ -761,8 +761,8 @@ run_post_hook() {
 	local scriptfile
 
 	scriptfile="${HOOKS_DIR}/post-flow-${SUBCOMMAND}-${SUBACTION}"
-	if [ -x $scriptfile ]; then
-		$scriptfile "$@"
+	if [ -x "$scriptfile" ]; then
+		"$scriptfile" "$@"
 	fi
 }
 
