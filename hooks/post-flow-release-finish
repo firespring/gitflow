@@ -36,7 +36,7 @@ if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; 
     " >> /tmp/git-flow.hooks.log 2>&1
   fi
 else
-  echo "WARNING: Targetprocess user information is not configured. Skipping targetprocess updates."
+  echo -e "\n ** WARNING: Targetprocess user information is not configured. Skipping targetprocess updates **\n"
 fi
 
 exit 0
