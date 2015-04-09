@@ -101,7 +101,7 @@ install)
 		install -v -m 0644 "$REPO_NAME/$script_file" "$BINDIR"
 	done
 	for hook_file in $HOOK_FILES ; do
-		install -v -m 0644 "$hook_file"  "$DOCDIR/hooks"
+		install -v -m 0755 "$hook_file"  "$DOCDIR/hooks"
 	done
 	exit
 	;;
