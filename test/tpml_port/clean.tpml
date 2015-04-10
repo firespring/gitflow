@@ -1,0 +1,9 @@
+<tpml>
+  <import file='variables.tpml'/>
+  <import file='init.tpml'/>
+
+  <story name="Remove $FEATURE1">
+    <command>cd $TEST_DIR; git push origin :feature/$FEATURE1/develop</command>
+    <command>cd $TEST_DIR; git branch -D feature/$FEATURE1/develop</command>
+  </story>
+</tpml>

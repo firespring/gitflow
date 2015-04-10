@@ -1,0 +1,56 @@
+<tpml>
+  <global>
+    <key>TEST_DIR</key>
+    <value>/tmp/test/</value>
+  </global>
+
+  <global>
+    <key>FEATURE1</key>
+    <value>TP-1111</value>
+  </global>
+
+  <global>
+    <key>FEATURE2</key>
+    <value>TP-2222</value>
+  </global>
+
+  <global>
+    <key>FEATURE3</key>
+    <value>TP-3333</value>
+  </global>
+
+  <global>
+    <key>STORY1</key>
+    <value>TP-1234</value>
+  </global>
+
+  <global>
+    <key>STORY2</key>
+    <value>TP-2345</value>
+  </global>
+
+  <global>
+    <key>STORY3</key>
+    <value>TP-5678</value>
+  </global>
+
+  <global>
+    <key>RELEASE1</key>
+    <value>r751-1</value>
+  </global>
+
+  <global>
+    <key>RELEASE2</key>
+    <value>r752-1</value>
+  </global>
+
+  <global>
+    <key>RELEASE3</key>
+    <value>r753-1</value>
+  </global>
+
+  <global>
+    <key>HOTFIX1</key>
+    <value>r751-2</value>
+  </global>
+</tpml>

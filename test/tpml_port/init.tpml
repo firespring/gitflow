@@ -1,0 +1,21 @@
+<tpml>
+  <import file='variables.tpml' />
+
+  <story name='Setup test directory: $TEST_DIR'>
+    <command>[ "$TEST_DIR" != "" ]; echo $?</command>
+    <successCriteria>
+      <returnCode>0</returnCode>
+    </successCriteria>
+
+    <command>rm -rf $TEST_DIR</command>
+    <command>git clone --branch master git@github.com:jebmeier/test.git $TEST_DIR</command>
+    <successCriteria>
+      <returnCode>0</returnCode>
+    </successCriteria>
+    
+    <command>cd $TEST_DIR; git flow init -d</command>
+    <successCriteria>
+      <returnCode>0</returnCode>
+    </successCriteria>
+  </story>
+</tpml>
