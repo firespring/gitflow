@@ -2,8 +2,76 @@
   <import file='variables.tpml'/>
   <import file='init.tpml'/>
 
-  <story name="Remove $FEATURE1">
+  <story name="Remove feature branch ($FEATURE1)">
     <command>cd $TEST_DIR; git push origin :feature/$FEATURE1/develop</command>
     <command>cd $TEST_DIR; git branch -D feature/$FEATURE1/develop</command>
+  </story>
+
+  <story name="Removing feature branch ($FEATURE2)">
+    <command>git push origin :feature/$FEATURE2/develop</command>
+    <command>git branch -D feature/$FEATURE2/develop</command>
+  </story>
+
+  <story name="Removing feature branch ($FEATURE3)">
+    <command>git push origin :feature/$FEATURE3/develop</command>
+    <command>git branch -D feature/$FEATURE3/develop</command>
+  </story>
+
+  <story name="Removing story branch ($STORY1)">
+    <command>git push origin :feature/$FEATURE1/story/$STORY1</command>
+    <command>git branch -D feature/$FEATURE1/story/$STORY1</command>
+  </story>
+
+  <story name="Removing story branch ($STORY2)">
+    <command>git push origin :feature/$FEATURE2/story/$STORY2</command>
+    <command>git branch -D feature/$FEATURE2/story/$STORY2</command>
+  </story>
+
+  <story name="Removing story branch ($STORY3)">
+    <command>git push origin :feature/$FEATURE2/story/$STORY3</command>
+    <command>git branch -D feature/$FEATURE2/story/$STORY3</command>
+  </story>
+
+  <story name="Removing standalone-story branch ($STORY1)">
+    <command>git push origin :story/$STORY1</command>
+    <command>git branch -D /story/$STORY1</command>
+  </story>
+
+  <story name="Removing standalone-story branch ($STORY2)">
+    <command>git push origin :story/$STORY2</command>
+    <command>git branch -D story/$STORY2</command>
+  </story>
+
+  <story name="Removing standalone-story branch ($STORY3)">
+    <command>git push origin :story/$STORY3</command>
+    <command>git branch -D story/$STORY3</command>
+  </story>
+
+  <story name="Removing release branch ($RELEASE1)">
+    <command>git push origin :release/$RELEASE1</command>
+    <command>git branch -D release/$RELEASE1</command>
+    <command>git tag -d $RELEASE1 </command>
+    <command>git push origin :refs/tags/$RELEASE1</command>
+  </story>
+
+  <story name="Removing release branch ($RELEASE2)">
+    <command>git push origin :release/$RELEASE2</command>
+    <command>git branch -D release/$RELEASE2</command>
+    <command>git tag -d $RELEASE2</command>
+    <command>git push origin :refs/tags/$RELEASE2</command>
+  </story>
+
+  <story name="Removing release branch ($RELEASE3)">
+    <command>git push origin :release/$RELEASE3</command>
+    <command>git branch -D release/$RELEASE3</command>
+    <command>git tag -d $RELEASE3 </command>
+    <command>git push origin :refs/tags/$RELEASE3</command>
+  </story>
+
+  <story name="Removing hotfix branch ($HOTFIX1)">
+    <command>git push origin :hotfix/$HOTFIX1</command>
+    <command>git branch -D hotfix/$HOTFIX1</command>
+    <command>git tag -d $HOTFIX1 </command>
+    <command>git push origin :refs/tags/$HOTFIX1</command>
   </story>
 </tpml>
