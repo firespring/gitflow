@@ -24,7 +24,7 @@ fi
 
 if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
   # Mark the story as done
-  STORY_NUMBER=`echo $NAME | sed -r "s@[^0-9]*([0-9]+).*@\1@g"`
+  STORY_NUMBER=`echo $NAME | sed -E "s@[^0-9]*([0-9]+).*@\1@g"`
   curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --request POST --header "Content-Type: application/json" --data "
     {
       EntityState: {
@@ -34,7 +34,7 @@ if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; 
   " >> /tmp/git-flow.hooks.log 2>&1
 
   # Add the standalone-story to the release it was merged into
-  RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$RELEASE'" --request GET --header "Accept: application/json" | egrep '"Id"' | head -1 | sed -r "s@[^0-9]*([0-9]+).*@\1@g"`"
+  RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$RELEASE'" --request GET --header "Accept: application/json" | egrep '"Id"' | head -1 | sed -E "s@[^0-9]*([0-9]+).*@\1@g"`"
 
   if [ "$RELEASE_ID" != "" ]
   then
