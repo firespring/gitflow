@@ -32,7 +32,7 @@ if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; 
       {
         Name: '$VERSION',
         StartDate: '`date +"%Y-%m-%d"`',
-        EndDate: '`date -d "+30 days" +"%Y-%m-%d"`',
+        EndDate: '`date -d "+30 days" +"%Y-%m-%d" 2>/dev/null || date -v+30d +%Y-%m-%d 2>/dev/null`',
         IsCurrent: false,
         Owner: {
           Id: 1
