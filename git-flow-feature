@@ -153,7 +153,7 @@ parse_args() {
 	fi
 
   # Strip FEATURE_BASE_BRANCH off the end of the feature name if present
-  NAME=`echo "$NAME" | sed -re "s@/$FEATURE_BASE_BRANCH\\$@@g"`
+  NAME=`echo "$NAME" | sed -E "s@/$FEATURE_BASE_BRANCH\\$@@g"`
   BRANCH=$PREFIX$NAME/$FEATURE_BASE_BRANCH
 }
 
@@ -169,7 +169,7 @@ parse_finish_args() {
 	fi
 
   # Strip FEATURE_BASE_BRANCH off the end of the feature name if present
-  NAME=`echo "$NAME" | sed -re "s@/$FEATURE_BASE_BRANCH\\$@@g"`
+  NAME=`echo "$NAME" | sed -E "s@/$FEATURE_BASE_BRANCH\\$@@g"`
   BRANCH=$PREFIX$NAME/$FEATURE_BASE_BRANCH
 
 	if [ -z $2 ]; then

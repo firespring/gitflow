@@ -560,11 +560,11 @@ gitflow_use_current_branch_name() {
 
 	if startswith "$current_branch" "$PREFIX" && notcontains "$current_branch" "story"; then
 		BRANCH=$current_branch
-		NAME=`echo "$BRANCH" | sed -re "s@.*$PREFIX([^/]+).*@\1@g"`
+		NAME=`echo "$BRANCH" | sed -E "s@.*$PREFIX([^/]+).*@\1@g"`
 
 	elif contains "$current_branch" "$PREFIX" && [ "$SUBCOMMAND" = 'story' ]; then
 		BRANCH=$current_branch
-		NAME=`echo "$BRANCH" | sed -re "s@.*$PREFIX([^/]+).*@\1@g"`
+		NAME=`echo "$BRANCH" | sed -E "s@.*$PREFIX([^/]+).*@\1@g"`
 
 	else
 		warn "The curent HEAD is no ${SUBCOMMAND} branch."
@@ -595,11 +595,11 @@ gitflow_use_current_branch_version() {
 
 	if startswith "$current_branch" "$PREFIX" && notcontains "$current_branch" "story"; then
 		BRANCH=$current_branch
-		VERSION=`echo "$BRANCH" | sed -re "s@.*$PREFIX([^/]+).*@\1@g"`
+		VERSION=`echo "$BRANCH" | sed -E "s@.*$PREFIX([^/]+).*@\1@g"`
 
 	elif contains "$current_branch" "$PREFIX" && [ "$SUBCOMMAND" = 'story' ]; then
 		BRANCH=$current_branch
-		VERSION=`echo "$BRANCH" | sed -re "s@.*$PREFIX([^/]+).*@\1@g"`
+		VERSION=`echo "$BRANCH" | sed -E "s@.*$PREFIX([^/]+).*@\1@g"`
 
 	else
 		warn "The current HEAD is no ${SUBCOMMAND} branch."
