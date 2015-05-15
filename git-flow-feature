@@ -334,7 +334,7 @@ no-ff!                 Never fast-forward during the merge
 	fi
 
   if [ "$RELEASE" = "" ]; then
-    die "Must specify a release to merge this feature in to"
+    die "Must specify a release to merge this feature into"
   fi
 
 	# Keeping both branches implies the --keep flag to be true.
