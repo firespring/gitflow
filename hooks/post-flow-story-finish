@@ -16,7 +16,9 @@ NAME=$1
 ORIGIN=$2
 BRANCH=$3
 
-if [ -f ~/.env ]; then
+if [ -f ~/.tp_credentials ]; then
+  . ~/.tp_credentials
+elif [ -f ~/.env ]; then
   . ~/.env
 fi
 

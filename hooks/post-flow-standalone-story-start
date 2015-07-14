@@ -18,7 +18,9 @@ ORIGIN=$2
 BRANCH=$3
 BASE=$4
 
-if [ -f ~/.env ]; then
+if [ -f ~/.tp_credentials ]; then
+  . ~/.tp_credentials
+elif [ -f ~/.env ]; then
   . ~/.env
 fi
 
