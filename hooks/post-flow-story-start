@@ -20,8 +20,8 @@ BRANCH=$3
 BASE=$4
 FEATURE=$5
 
-if [ -f ~/.tp_credentials ]; then
-  . ~/.tp_credentials
+if [ -f ~/.tp.credentials ]; then
+  . ~/.tp.credentials
 elif [ -f ~/.env ]; then
   . ~/.env
 fi
