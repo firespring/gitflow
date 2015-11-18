@@ -3,7 +3,7 @@ set -e
 cd `dirname $0`
 
 export TEST_DIR="$1"
-if [ "${TEST_DIR}" == "" ]
+if [ "${TEST_DIR}" = "" ]
 then
   echo 'No test directory specified'
   exit 1
