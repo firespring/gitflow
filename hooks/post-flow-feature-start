@@ -18,7 +18,9 @@ ORIGIN=$2
 BRANCH=$3
 BASE=$4
 
-if [ -f ~/.tp_credentials ]; then
+if [ -f ~/.tp.credentials ]; then
+  . ~/.tp.credentials
+elif [ -f ~/.tp_credentials ]; then
   . ~/.tp_credentials
 elif [ -f ~/.env ]; then
   . ~/.env
@@ -27,13 +29,19 @@ fi
 if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
   # Mark the feature as pending
   FEATURE_NUMBER=`echo $NAME | sed -E "s@[^0-9]*([0-9]+).*@\1@g"`
-  curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data "
-    {
-      EntityState: {
-        Id: 58
+
+  # A bit messy - you have to set entitystate using the ID and the ID is different for each project.
+  # So try to set the ID for both projects and one will work and the other won't
+  for entitystate in 58 38
+  do
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data "
+      {
+        EntityState: {
+          Id: $entitystate
+        }
       }
-    }
-  " >> /tmp/git-flow.hooks.log 2>&1
+    " >> /tmp/git-flow.hooks.log 2>&1
+  done
 
   # Find the TP User Id of my user
   USER_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Users -d "where=Login eq '$TP_USERNAME'" --request GET --header "Accept: application/json" | egrep '"Id"' | head -1 | sed -E "s@[^0-9]*([0-9]+).*@\1@g"`"

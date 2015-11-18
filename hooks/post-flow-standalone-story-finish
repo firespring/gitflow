@@ -6,7 +6,7 @@
 # $1    The friendly name of the branch
 # $2    The origin remote
 # $3    The full branch name (including the feature prefix)
-# $4    The name of the release this feature will be merged into
+# $4    The name of the release this standalone-story will be merged into
 #
 # The following variables are available as they are exported by git-flow:
 #
@@ -18,22 +18,30 @@ ORIGIN=$2
 BRANCH=$3
 RELEASE=$4
 
-if [ -f ~/.tp_credentials ]; then
+if [ -f ~/.tp.credentials ]; then
+  . ~/.tp.credentials
+elif [ -f ~/.tp_credentials ]; then
   . ~/.tp_credentials
 elif [ -f ~/.env ]; then
   . ~/.env
 fi
 
 if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
-  # Mark the story as done
+  # Mark the story as QA Pending/Done
   STORY_NUMBER=`echo $NAME | sed -E "s@[^0-9]*([0-9]+).*@\1@g"`
-  curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --request POST --header "Content-Type: application/json" --data "
-    {
-      EntityState: {
-        Id: 73
+
+  # A bit messy - you have to set entitystate using the ID and the ID is different for each project.
+  # So try to set the ID for both projects and one will work and the other won't
+  for entitystate in 73 24
+  do
+    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/UserStories/$STORY_NUMBER --request POST --header "Content-Type: application/json" --data "
+      {
+        EntityState: {
+          Id: $entitystate
+        }
       }
-    }
-  " >> /tmp/git-flow.hooks.log 2>&1
+    " >> /tmp/git-flow.hooks.log 2>&1
+  done
 
   # Add the standalone-story to the release it was merged into
   RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$RELEASE'" --request GET --header "Accept: application/json" | egrep '"Id"' | head -1 | sed -E "s@[^0-9]*([0-9]+).*@\1@g"`"
