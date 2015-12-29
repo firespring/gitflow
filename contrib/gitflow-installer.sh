@@ -21,8 +21,6 @@ usage() {
 # Does this need to be smarter for each host OS?
 if [ -z "$PREFIX" ] ; then
 	PREFIX="/usr/local"
-elif [ "$PREFIX" == "/"] ; then
-  PREFIX=""
 fi
 
 if [ -z "$REPO_NAME" ] ; then
@@ -35,7 +33,7 @@ fi
 
 EXEC_PREFIX="$PREFIX"
 BINDIR="$EXEC_PREFIX/bin"
-DOCDIR="$PREFIX/local/share/doc/gitflow"
+DOCDIR="$PREFIX/share/doc/gitflow"
 
 EXEC_FILES="git-flow"
 SCRIPT_FILES="git-flow-init git-flow-standalone-story git-flow-feature git-flow-story git-flow-hotfix git-flow-release git-flow-support git-flow-version gitflow-common gitflow-shFlags git-flow-config"
