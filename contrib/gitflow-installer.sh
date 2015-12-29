@@ -74,9 +74,6 @@ install)
 		echo "Cloning repo from GitHub to $REPO_NAME"
 		git clone "$REPO_HOME" "$REPO_NAME"
 	fi
-	cd "$REPO_NAME"
-	git pull
-	cd "$OLDPWD"
 	case "$2" in
 	stable)
 		cd "$REPO_NAME"
