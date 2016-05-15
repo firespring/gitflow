@@ -29,7 +29,7 @@ fi
 if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
   # Check if a release exists in TP for the gitflow release we are creating.
   result_query="`curl --silent -XGET --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$VERSION'" --header "Accept: application/json"`"
-  if [ `echo $result_query | egrep -q '"Items": \[\]'; echo $?` -eq 0 ]
+  if [ `echo $result_query | egrep -q '"Items":[[:space:]]*\[\]'; echo $?` -eq 0 ]
   then
     # No release branch exists - create one
     curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases --header "Content-Type: application/json" --data "
