@@ -43,7 +43,13 @@ if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; 
         },
         Project: {
           Id: 217
-        }
+        },
+        CustomFields: [
+          {
+            Name: 'Deploy Date',
+            Value: '`date -d "+36 days" +"%Y-%m-%d" 2>/dev/null || date -v+36d +%Y-%m-%d 2>/dev/null`'
+          }
+        ]
       }
     " >> /tmp/git-flow.hooks.log 2>&1
   fi
