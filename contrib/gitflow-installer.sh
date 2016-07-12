@@ -33,8 +33,7 @@ fi
 
 EXEC_PREFIX="$PREFIX"
 BINDIR="$EXEC_PREFIX/bin"
-DATAROOTDIR="$PREFIX/share"
-DOCDIR="$DATAROOTDIR/doc/gitflow"
+DOCDIR="$PREFIX/share/doc/gitflow"
 
 EXEC_FILES="git-flow"
 SCRIPT_FILES="git-flow-init git-flow-feature git-flow-hotfix git-flow-release git-flow-support git-flow-version gitflow-common gitflow-shFlags git-flow-config"
@@ -73,9 +72,6 @@ install)
 		echo "Cloning repo from GitHub to $REPO_NAME"
 		git clone "$REPO_HOME" "$REPO_NAME"
 	fi
-	cd "$REPO_NAME"
-	git pull
-	cd "$OLDPWD"
 	case "$2" in
 	stable)
 		cd "$REPO_NAME"
@@ -92,17 +88,49 @@ install)
 		exit
 		;;
 	esac
-	install -v -d -m 0755 "$PREFIX/bin"
-	install -v -d -m 0755 "$DOCDIR/hooks"
+
+  for directory in "$PREFIX/bin" "$DOCDIR/hooks"
+  do
+    echo "mkdir -p ${directory}"
+    mkdir -p ${directory}
+    
+    echo "chmod 0755 ${directory}"
+    chmod 0755 ${directory}
+  done
+
 	for exec_file in $EXEC_FILES ; do
-		install -v -m 0755 "$REPO_NAME/$exec_file" "$BINDIR"
+    source_file="$REPO_NAME/$exec_file"
+    dest_file="$BINDIR/`basename $exec_file`"
+
+    echo "cp ${source_file} ${dest_file}"
+    cp ${source_file} ${dest_file}
+
+    echo "chmod 0755 ${dest_file}"
+    chmod 0755 ${dest_file}
 	done
+
 	for script_file in $SCRIPT_FILES ; do
-		install -v -m 0644 "$REPO_NAME/$script_file" "$BINDIR"
+    source_file="$REPO_NAME/$script_file"
+    dest_file="$BINDIR/`basename $script_file`"
+
+    echo "cp ${source_file} ${dest_file}"
+    cp ${source_file} ${dest_file}
+
+    echo "chmod 0755 ${dest_file}"
+    chmod 0644 ${dest_file}
 	done
+
 	for hook_file in $HOOK_FILES ; do
-		install -v -m 0644 "$hook_file"  "$DOCDIR/hooks"
+    source_file="$hook_file"
+    dest_file="$DOCDIR/hooks/`basename $hook_file`"
+
+    echo "cp ${source_file} ${dest_file}"
+    cp ${source_file} ${dest_file}
+
+    echo "chmod 0755 ${dest_file}"
+    chmod 0755 ${dest_file}
 	done
+
 	exit
 	;;
 *)

@@ -57,7 +57,7 @@ install:
 	install -d -m 0755 $(docdir)/hooks
 	install -m 0755 $(EXEC_FILES) $(prefix)/bin
 	install -m 0644 $(SCRIPT_FILES) $(prefix)/bin
-	install -m 0644 $(HOOK_FILES) $(docdir)/hooks
+	install -m 0755 $(HOOK_FILES) $(docdir)/hooks
 
 uninstall:
 	test -d $(prefix)/bin && \
