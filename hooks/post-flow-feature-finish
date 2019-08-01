@@ -18,45 +18,7 @@ ORIGIN=$2
 BRANCH=$3
 RELEASE=$4
 
-if [ -f ~/.tp.credentials ]; then
-  . ~/.tp.credentials
-elif [ -f ~/.tp_credentials ]; then
-  . ~/.tp_credentials
-elif [ -f ~/.env ]; then
-  . ~/.env
-fi
+# Implement your script here.
 
-if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
-  # Mark the feature as qa pending
-  FEATURE_NUMBER=`echo $NAME | sed -E "s@[^0-9]*([0-9]+).*@\1@g"`
-
-  # A bit messy - you have to set entitystate using the ID and the ID is different for each project.
-  # So try to set the ID for both projects and one will work and the other won't
-  for entitystate in 98 39
-  do
-    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --request POST --header "Content-Type: application/json" --data "
-      {
-        EntityState: {
-          Id: $entitystate
-        }
-      }
-    " >> /tmp/git-flow.hooks.log 2>&1
-  done
-
-  # Add the feature to the release it was merged into
-  RELEASE_ID="`curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$RELEASE'" --request GET --header "Accept: application/json" | egrep '"Id"' | head -1 | sed -E "s@[^0-9]*([0-9]+).*@\1@g"`"
-
-  if [ "$RELEASE_ID" != "" ]
-  then
-    # Update the feature's release
-    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Features/$FEATURE_NUMBER --header "Content-Type: application/json" --data "
-      {
-        Release: {Id: $RELEASE_ID}
-      }
-    " >> /tmp/git-flow.hooks.log 2>&1
-  fi
-else
-  echo -e "\n ** WARNING: Targetprocess user information is not configured. Skipping targetprocess updates **\n"
-fi
-
+# To terminate the git-flow action, return a non-zero exit code.
 exit 0
