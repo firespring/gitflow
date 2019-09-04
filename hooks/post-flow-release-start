@@ -18,43 +18,6 @@ ORIGIN=$2
 BRANCH=$3
 BASE=$4
 
-if [ -f ~/.tp.credentials ]; then
-  . ~/.tp.credentials
-elif [ -f ~/.tp_credentials ]; then
-  . ~/.tp_credentials
-elif [ -f ~/.env ]; then
-  . ~/.env
-fi
-
-if [ "$TP_USERNAME" != "" ] && [ "$TP_PASSWORD" != "" ] && [ "$TP_URL" != "" ]; then
-  # Check if a release exists in TP for the gitflow release we are creating.
-  result_query="`curl --silent -XGET --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases -d "where=Name eq '$VERSION'" --header "Accept: application/json"`"
-  if [ `echo $result_query | egrep -q '"Items":[[:space:]]*\[\]'; echo $?` -eq 0 ]
-  then
-    # No release branch exists - create one
-    curl --silent --user $TP_USERNAME:$TP_PASSWORD https://$TP_URL/api/v1/Releases --header "Content-Type: application/json" --data "
-      {
-        Name: '$VERSION',
-        StartDate: '`date +"%Y-%m-%d"`',
-        EndDate: '`date -d "+30 days" +"%Y-%m-%d" 2>/dev/null || date -v+30d +%Y-%m-%d 2>/dev/null`',
-        IsCurrent: false,
-        Owner: {
-          Id: 1
-        },
-        Project: {
-          Id: 217
-        },
-        CustomFields: [
-          {
-            Name: 'Deploy Date',
-            Value: '`date -d "+36 days" +"%Y-%m-%d" 2>/dev/null || date -v+36d +%Y-%m-%d 2>/dev/null`'
-          }
-        ]
-      }
-    " >> /tmp/git-flow.hooks.log 2>&1
-  fi
-else
-  echo -e "\n ** WARNING: Targetprocess user information is not configured. Skipping targetprocess updates **\n"
-fi
+# Implement your script here.
 
 exit 0
